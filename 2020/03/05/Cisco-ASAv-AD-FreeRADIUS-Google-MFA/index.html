@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Cisco AnyConnect with FreeRADIUS集成域账号+谷歌双因素认证[toc] 一、环境介绍 拓扑图    实验环境CentOS8有两块网卡，一块网卡用于访问Internet，一块网卡位于防火墙inside区域。 这里使用CentOS8（CentOS7也可以）安装FreeRADIUS和Google Authenticator。Windows Server 2016安装AD服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cisco-ASAv-AD-FreeRADIUS-Google-MFA">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;03&#x2F;05&#x2F;Cisco-ASAv-AD-FreeRADIUS-Google-MFA&#x2F;index.html">
+<meta property="og:site_name" content="人行横道">
+<meta property="og:description" content="Cisco AnyConnect with FreeRADIUS集成域账号+谷歌双因素认证[toc] 一、环境介绍 拓扑图    实验环境CentOS8有两块网卡，一块网卡用于访问Internet，一块网卡位于防火墙inside区域。 这里使用CentOS8（CentOS7也可以）安装FreeRADIUS和Google Authenticator。Windows Server 2016安装AD服务">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;SZ2KuxJ.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;WPmHMbw.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;iob0eN1.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;vB3lsVB.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;tsaIhtn.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;mTBZzHP.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;GHYnhQV.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;6JVzXTe.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;aOKXihC.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;jl3cuWs.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;tZ4WXkO.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;27Tys6P.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;yDldZQN.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;Wd67FDT.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;ikcoNOL.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;yDldZQN.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;Jk0wHuH.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;ikcoNOL.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;Ek8Ko1d.png">
+<meta property="og:updated_time" content="2020-03-05T14:08:58.117Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;SZ2KuxJ.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/03/05/Cisco-ASAv-AD-FreeRADIUS-Google-MFA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>Cisco-ASAv-AD-FreeRADIUS-Google-MFA | 人行横道</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">人行横道</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-crosswalk blog"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/05/Cisco-ASAv-AD-FreeRADIUS-Google-MFA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="crosswalk">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="人行横道">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Cisco-ASAv-AD-FreeRADIUS-Google-MFA
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2020-03-05 22:08:29 / Modified: 22:08:58" itemprop="dateCreated datePublished" datetime="2020-03-05T22:08:29+08:00">2020-03-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Cisco-AnyConnect-with-FreeRADIUS集成域账号-谷歌双因素认证"><a href="#Cisco-AnyConnect-with-FreeRADIUS集成域账号-谷歌双因素认证" class="headerlink" title="Cisco AnyConnect with FreeRADIUS集成域账号+谷歌双因素认证"></a>Cisco AnyConnect with FreeRADIUS集成域账号+谷歌双因素认证</h1><p>[toc]</p>
+<h2 id="一、环境介绍"><a href="#一、环境介绍" class="headerlink" title="一、环境介绍"></a>一、环境介绍</h2><ul>
+<li>拓扑图</li>
+</ul>
+<p><img src="https://i.imgur.com/SZ2KuxJ.png" alt="topo"></p>
+<ul>
+<li>实验环境CentOS8有两块网卡，一块网卡用于访问Internet，一块网卡位于防火墙inside区域。</li>
+<li>这里使用CentOS8（CentOS7也可以）安装FreeRADIUS和Google Authenticator。Windows Server 2016安装AD服务，AD安装过程这里不做介绍。需要用户在手机上安装Google-Authenticator APP。</li>
+<li>用户使用AnyConnect拨号，输入用户名和密码，密码框输入<strong>密码+动态码</strong>，实现<strong>AD账号+动态码</strong>双因素认证。</li>
+</ul>
+<h2 id="二、CentOS8-环境设置"><a href="#二、CentOS8-环境设置" class="headerlink" title="二、CentOS8 环境设置"></a>二、CentOS8 环境设置</h2><ul>
+<li>系统更新<br><code>[root@centos8 ~]# yum update</code></li>
+</ul>
+<ul>
+<li>修改时区<br><code>[root@centos8 /]# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</code></li>
+</ul>
+<ul>
+<li>查看时间是否正确<br><code>[root@centos8 /]#ll /etc/localtime</code></li>
+</ul>
+<ul>
+<li>关闭SElinux，临时关闭和永久关闭。<br><code>[root@centos8 ~]# setenforce 0</code><br><code>[root@centos8 ~]# sed -i &#39;s/=enforcing/=permissive/g&#39; /etc/selinux/config</code></li>
+</ul>
+<ul>
+<li>查看SElinux状态。<br><code>[root@centos8 ~]# getenforce</code><br><code>Permissive</code></li>
+</ul>
+<ul>
+<li>关闭防火墙(可选)，本次实验未关闭防火墙。<br><code>[root@centos8 ~]# systemctl stop firewalld.service</code><br><code>[root@centos8 ~]# systemctl disable firewalld.service</code></li>
+</ul>
+<hr>
+<h2 id="三、FreeRADIUS-安装及配置"><a href="#三、FreeRADIUS-安装及配置" class="headerlink" title="三、FreeRADIUS 安装及配置"></a>三、FreeRADIUS 安装及配置</h2><h3 id="3-1-FreeRADIUS安装"><a href="#3-1-FreeRADIUS安装" class="headerlink" title="3.1 FreeRADIUS安装"></a>3.1 FreeRADIUS安装</h3><ul>
+<li>安装FreeRADIUS<br><code>[root@centos8 ~]# yum install freeradius freeradius-utils</code></li>
+</ul>
+<ul>
+<li>启动radius服务<br><code>[root@centos8 ~]# systemctl enable --now radiusd.service</code></li>
+</ul>
+<ul>
+<li>防火墙放行radius<br><code>[root@centos8 ~]# firewall-cmd --add-service=radius --permanent</code><br><code>[root@centos8 ~]# firewall-cmd --reload</code></li>
+</ul>
+<h3 id="3-2-FreeRADIUS修改配置文件"><a href="#3-2-FreeRADIUS修改配置文件" class="headerlink" title="3.2 FreeRADIUS修改配置文件"></a>3.2 FreeRADIUS修改配置文件</h3><ul>
+<li>由于FreeRadius必须有权访问所有用户目录中的.google_authenticator令牌，因此它必须具有root权限。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/raddb/radiusd.conf</span><br><span class="line"></span><br><span class="line">        #user = radiusd</span><br><span class="line">        #group = radiusd</span><br><span class="line">        user = root</span><br><span class="line">        group = root</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>取消<code>pam</code>的注释，radius激活PAM（Pluggable Authentication Modules）可动态加载验证模块。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]#  vi /etc/raddb/sites-enabled/default</span><br><span class="line"></span><br><span class="line">        pam</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>激活pam，radius pam模块默认没有激活。<br><code>[root@centos8 ~]#  ln -s /etc/raddb/mods-available/pam /etc/raddb/mods-enabled/pam</code></li>
+</ul>
+<ul>
+<li>编辑<code>/etc/raddb/clients.conf</code>配置文件，接受来Cisco ASAv的radius认证请求。在行末添加防火墙的与共享密钥和ip地址。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/raddb/clients.conf</span><br><span class="line"></span><br><span class="line">client 192.168.1.254 &#123;</span><br><span class="line"> secret = cisco</span><br><span class="line"> shortname = CiscoASA</span><br><span class="line"> nastype = cisco</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="3-1-FreeRADIUS-服务测试"><a href="#3-1-FreeRADIUS-服务测试" class="headerlink" title="3.1 FreeRADIUS 服务测试"></a>3.1 FreeRADIUS 服务测试</h3><ul>
+<li>新建用户组，如果你需要拒绝用户访问，可以将用户加入到这个组。<br><code>[root@centos8 ~]# groupadd radius-disabled</code></li>
+</ul>
+<ul>
+<li>编辑<code>/etc/raddb/users</code>将创建的“radius-disabled”组添加到“拒绝用户组”部分。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/raddb/users</span><br><span class="line"></span><br><span class="line">#DEFAULT        Group == &quot;disabled&quot;, Auth-Type := Reject</span><br><span class="line">#               Reply-Message = &quot;Your account has been disabled.&quot;</span><br><span class="line"></span><br><span class="line">DEFAULT         Group == &quot;radius-disabled&quot;, Auth-Type := Reject</span><br><span class="line">                Reply-Message = &quot;Your account has been disabled.&quot;</span><br><span class="line">DEFAULT         Auth-Type := PAM</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>CentOS新建本地账号测试radius服务。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# useradd radlocal</span><br><span class="line">[root@centos8 ~]# passwd radlocal</span><br><span class="line">更改用户 radlocal 的密码 。</span><br><span class="line">新的 密码：radpassword</span><br><span class="line">重新输入新的 密码：radpassword</span><br><span class="line">passwd：所有的身份验证令牌已经成功更新。</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>radius 开启调式模式，这个命令非常有用，如果认证不成功，可以根据报错信息定位到错误发生的原因。<br><code>[root@centos8 ~]# radiusd -X</code></li>
+</ul>
+<ul>
+<li>新建一个窗口，测试本地账号radius验证是否通过，注意<code>Received Access-Accept</code>表示认证通过。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# radtest radlocal radpassword localhost 18120 testing123</span><br><span class="line">Sent Access-Request Id 9 from 0.0.0.0:41546 to 127.0.0.1:1812 length 78</span><br><span class="line">        User-Name = &quot;radlocal&quot;</span><br><span class="line">        User-Password = &quot;radpassword&quot;</span><br><span class="line">        NAS-IP-Address = 172.20.29.110</span><br><span class="line">        NAS-Port = 18120</span><br><span class="line">        Message-Authenticator = 0x00</span><br><span class="line">        Cleartext-Password = &quot;radpassword&quot;</span><br><span class="line">Received Access-Accept Id 9 from 127.0.0.1:1812 to 127.0.0.1:41546 length 20</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>开启<code>radius -X</code>窗口显示的输出作为参考。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">Listening on auth address 127.0.0.1 port 18120 bound to server inner-tunnel</span><br><span class="line">Listening on proxy address * port 43164</span><br><span class="line">Listening on proxy address :: port 40551</span><br><span class="line">Ready to process requests</span><br><span class="line">(0) Received Access-Request Id 9 from 127.0.0.1:41546 to 127.0.0.1:1812 length 78</span><br><span class="line">(0)   User-Name = &quot;radlocal&quot;</span><br><span class="line">(0)   User-Password = &quot;radpassword&quot;</span><br><span class="line">(0)   NAS-IP-Address = 172.20.29.110</span><br><span class="line">(0)   NAS-Port = 18120</span><br><span class="line">(0)   Message-Authenticator = 0xeba37c10c860860bd3dcc7bff2c5edf0</span><br><span class="line">(0) # Executing section authorize from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   authorize &#123;</span><br><span class="line">(0)     policy filter_username &#123;</span><br><span class="line">(0)       if (&amp;User-Name) &#123;</span><br><span class="line">(0)       if (&amp;User-Name)  -&gt; TRUE</span><br><span class="line">(0)       if (&amp;User-Name)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ / /) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ / /)  -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /@[^@]*@/ ) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /@[^@]*@/ )  -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.\./ ) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.\./ )  -&gt; FALSE</span><br><span class="line">(0)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))  &#123;</span><br><span class="line">(0)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))   -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.$/)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.$/)   -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /@\./)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /@\./)   -&gt; FALSE</span><br><span class="line">(0)       &#125; # if (&amp;User-Name)  = notfound</span><br><span class="line">(0)     &#125; # policy filter_username = notfound</span><br><span class="line">(0)     [preprocess] = ok</span><br><span class="line">(0)     [chap] = noop</span><br><span class="line">(0)     [mschap] = noop</span><br><span class="line">(0)     [digest] = noop</span><br><span class="line">(0) suffix: Checking for suffix after &quot;@&quot;</span><br><span class="line">(0) suffix: No &apos;@&apos; in User-Name = &quot;radlocal&quot;, looking up realm NULL</span><br><span class="line">(0) suffix: No such realm &quot;NULL&quot;</span><br><span class="line">(0)     [suffix] = noop</span><br><span class="line">(0) eap: No EAP-Message, not doing EAP</span><br><span class="line">(0)     [eap] = noop</span><br><span class="line">(0) files: users: Matched entry DEFAULT at line 69</span><br><span class="line">(0)     [files] = ok</span><br><span class="line">(0)     [expiration] = noop</span><br><span class="line">(0)     [logintime] = noop</span><br><span class="line">(0) pap: WARNING: No &quot;known good&quot; password found for the user.  Not setting Auth-Type</span><br><span class="line">(0) pap: WARNING: Authentication will fail unless a &quot;known good&quot; password is available</span><br><span class="line">(0)     [pap] = noop</span><br><span class="line">(0)   &#125; # authorize = ok</span><br><span class="line">(0) Found Auth-Type = pam</span><br><span class="line">(0) # Executing group from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   authenticate &#123;</span><br><span class="line">(0) pam: Using pamauth string &quot;radiusd&quot; for pam.conf lookup</span><br><span class="line">(0) pam: Authentication succeeded</span><br><span class="line">(0)     [pam] = ok</span><br><span class="line">(0)   &#125; # authenticate = ok</span><br><span class="line">(0) # Executing section post-auth from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   post-auth &#123;</span><br><span class="line">(0)     update &#123;</span><br><span class="line">(0)       No attributes updated</span><br><span class="line">(0)     &#125; # update = noop</span><br><span class="line">(0)     [exec] = noop</span><br><span class="line">(0)     policy remove_reply_message_if_eap &#123;</span><br><span class="line">(0)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message) &#123;</span><br><span class="line">(0)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message)  -&gt; FALSE</span><br><span class="line">(0)       else &#123;</span><br><span class="line">(0)         [noop] = noop</span><br><span class="line">(0)       &#125; # else = noop</span><br><span class="line">(0)     &#125; # policy remove_reply_message_if_eap = noop</span><br><span class="line">(0)   &#125; # post-auth = noop</span><br><span class="line">(0) Sent Access-Accept Id 9 from 127.0.0.1:1812 to 127.0.0.1:41546 length 0</span><br><span class="line">(0) Finished request</span><br><span class="line">Waking up in 4.9 seconds.</span><br><span class="line">(0) Cleaning up request packet ID 9 with +50</span><br><span class="line">Ready to process requests</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<hr>
+<h2 id="四、SSSD安装配置"><a href="#四、SSSD安装配置" class="headerlink" title="四、SSSD安装配置"></a>四、SSSD安装配置</h2><ul>
+<li>AD已经安装和配置完成，下面是AD的一些配置信息。创建python.com域，DNS能解析公网地址，防止CentOS DNS指向AD之后无法yum安装软件。</li>
+</ul>
+<p><img src="https://i.imgur.com/WPmHMbw.png" alt="ad-01"></p>
+<ul>
+<li>创建mfatest的A记录，CentOS做测试解析用途。</li>
+</ul>
+<p><img src="https://i.imgur.com/iob0eN1.png" alt="ad-02"></p>
+<ul>
+<li>安装SSSD，CentOS8已经内建。<br><code>[root@centos8 ~]# yum install sssd realmd adcli</code><br><code>[root@centos8 ~]# yum install oddjob oddjob-mkhomedir sssd samba-commontools</code></li>
+</ul>
+<ul>
+<li>修改DNS，指向AD的IP地址。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/resolv.conf</span><br><span class="line">nameserver 192.168.1.20</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>DNS连通性测试<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# ping python.com</span><br><span class="line">PING python.com (192.168.1.20) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.1.20 (192.168.1.20): icmp_seq=1 ttl=128 time=0.205 ms</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>DNS解析测试<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# nslookup</span><br><span class="line">&gt; mfatest.python.com</span><br><span class="line">Server:         192.168.1.20</span><br><span class="line">Address:        192.168.1.20#53</span><br><span class="line"></span><br><span class="line">Name:   mfatest.python.com</span><br><span class="line">Address: 1.1.1.1</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>CentOS加入python.com域，输入管理员密码。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# realm join python.com</span><br><span class="line">Administrator 的密码：</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>可以发现域信息。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# realm list</span><br><span class="line">python.com</span><br><span class="line">  type: kerberos</span><br><span class="line">  realm-name: PYTHON.COM</span><br><span class="line">  domain-name: python.com</span><br><span class="line">  configured: kerberos-member</span><br><span class="line">  server-software: active-directory</span><br><span class="line">  client-software: sssd</span><br><span class="line">  required-package: oddjob</span><br><span class="line">  required-package: oddjob-mkhomedir</span><br><span class="line">  required-package: sssd</span><br><span class="line">  required-package: adcli</span><br><span class="line">  required-package: samba-common-tools</span><br><span class="line">  login-formats: %U@python.com</span><br><span class="line">  login-policy: allow-permitted-logins</span><br><span class="line">  permitted-logins:</span><br><span class="line">  permitted-groups: vpnusers</span><br></pre></td></tr></table></figure>
+
+
+
+
+</li>
+</ul>
+<ul>
+<li>AD查看CentOS8加入成功。</li>
+</ul>
+<p><img src="https://i.imgur.com/vB3lsVB.png" alt="ad-03"></p>
+<ul>
+<li>AD上创建测试用户wintest</li>
+</ul>
+<p><img src="https://i.imgur.com/tsaIhtn.png" alt="ad-04"></p>
+<ul>
+<li>在CentOS上使用AD的用户名密码登录测试。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# ssh -l wintest@python.com localhost</span><br><span class="line">The authenticity of host &apos;localhost (::1)&apos; can&apos;t be established.</span><br><span class="line">ECDSA key fingerprint is SHA256:JNzSM2I5llmwVPjZAmZa0n1TS9dAZJYTgB2Odpq5IWA.</span><br><span class="line">Are you sure you want to continue connecting (yes/no/[fingerprint])? yes</span><br><span class="line">Warning: Permanently added &apos;localhost&apos; (ECDSA) to the list of known hosts.</span><br><span class="line">wintest@python.com@localhost&apos;s password:</span><br><span class="line">Activate the web console with: systemctl enable --now cockpit.socket</span><br><span class="line"></span><br><span class="line">[wintest@python.com@centos8 ~]$ exit</span><br><span class="line">注销</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>AD创建vpnusers组，创建vpnuser用户</li>
+</ul>
+<p><img src="https://i.imgur.com/mTBZzHP.png" alt="ad-05"></p>
+<ul>
+<li>CentOS放行允许<code>vpnusers</code>这个组的用户在这台机器上认证。这条命令允许所有域账号认证：<code>realm permit -all</code>。这里放行的认证，不只放行了radius，还放行了ssh的认证，生产环境应该禁止这个组用户登录ssh。<br><code>[root@centos8 ~]# realm permit -g vpnusers</code></li>
+</ul>
+<ul>
+<li>开启radius调试模式<br><code>[root@centos8 ~]#radius -X</code></li>
+</ul>
+<ul>
+<li><p>在新的窗口，使用AD账号测试radius认证，认证通过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# radtest vpnuser@python.com Cisc0123 localhost 18120 testing123</span><br><span class="line">Sent Access-Request Id 16 from 0.0.0.0:38424 to 127.0.0.1:1812 length 88</span><br><span class="line">        User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">        User-Password = &quot;Cisc0123&quot;</span><br><span class="line">        NAS-IP-Address = 172.20.29.110</span><br><span class="line">        NAS-Port = 18120</span><br><span class="line">        Message-Authenticator = 0x00</span><br><span class="line">        Cleartext-Password = &quot;Cisc0123&quot;</span><br><span class="line">Received Access-Accept Id 16 from 127.0.0.1:1812 to 127.0.0.1:38424 length 20</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>radius调试模式看到的日志。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">(2) Received Access-Request Id 16 from 127.0.0.1:38424 to 127.0.0.1:1812 length 88</span><br><span class="line">(2)   User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">(2)   User-Password = &quot;Cisc0123&quot;</span><br><span class="line">(2)   NAS-IP-Address = 172.20.29.110</span><br><span class="line">(2)   NAS-Port = 18120</span><br><span class="line">(2)   Message-Authenticator = 0xd2adbf7920450d47617cc1c7128e437e</span><br><span class="line">(2) # Executing section authorize from file /etc/raddb/sites-enabled/default</span><br><span class="line">(2)   authorize &#123;</span><br><span class="line">(2)     policy filter_username &#123;</span><br><span class="line">(2)       if (&amp;User-Name) &#123;</span><br><span class="line">(2)       if (&amp;User-Name)  -&gt; TRUE</span><br><span class="line">(2)       if (&amp;User-Name)  &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ / /) &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ / /)  -&gt; FALSE</span><br><span class="line">(2)         if (&amp;User-Name =~ /@[^@]*@/ ) &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ /@[^@]*@/ )  -&gt; FALSE</span><br><span class="line">(2)         if (&amp;User-Name =~ /\.\./ ) &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ /\.\./ )  -&gt; FALSE</span><br><span class="line">(2)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))  &#123;</span><br><span class="line">(2)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))   -&gt; FALSE</span><br><span class="line">(2)         if (&amp;User-Name =~ /\.$/)  &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ /\.$/)   -&gt; FALSE</span><br><span class="line">(2)         if (&amp;User-Name =~ /@\./)  &#123;</span><br><span class="line">(2)         if (&amp;User-Name =~ /@\./)   -&gt; FALSE</span><br><span class="line">(2)       &#125; # if (&amp;User-Name)  = notfound</span><br><span class="line">(2)     &#125; # policy filter_username = notfound</span><br><span class="line">(2)     [preprocess] = ok</span><br><span class="line">(2)     [chap] = noop</span><br><span class="line">(2)     [mschap] = noop</span><br><span class="line">(2)     [digest] = noop</span><br><span class="line">(2) suffix: Checking for suffix after &quot;@&quot;</span><br><span class="line">(2) suffix: Looking up realm &quot;python.com&quot; for User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">(2) suffix: No such realm &quot;python.com&quot;</span><br><span class="line">(2)     [suffix] = noop</span><br><span class="line">(2) eap: No EAP-Message, not doing EAP</span><br><span class="line">(2)     [eap] = noop</span><br><span class="line">(2) files: users: Matched entry DEFAULT at line 69</span><br><span class="line">(2)     [files] = ok</span><br><span class="line">(2)     [expiration] = noop</span><br><span class="line">(2)     [logintime] = noop</span><br><span class="line">(2) pap: WARNING: No &quot;known good&quot; password found for the user.  Not setting Auth-Type</span><br><span class="line">(2) pap: WARNING: Authentication will fail unless a &quot;known good&quot; password is available</span><br><span class="line">(2)     [pap] = noop</span><br><span class="line">(2)   &#125; # authorize = ok</span><br><span class="line">(2) Found Auth-Type = pam</span><br><span class="line">(2) # Executing group from file /etc/raddb/sites-enabled/default</span><br><span class="line">(2)   authenticate &#123;</span><br><span class="line">(2) pam: Using pamauth string &quot;radiusd&quot; for pam.conf lookup</span><br><span class="line">(2) pam: Authentication succeeded</span><br><span class="line">(2)     [pam] = ok</span><br><span class="line">(2)   &#125; # authenticate = ok</span><br><span class="line">(2) # Executing section post-auth from file /etc/raddb/sites-enabled/default</span><br><span class="line">(2)   post-auth &#123;</span><br><span class="line">(2)     update &#123;</span><br><span class="line">(2)       No attributes updated</span><br><span class="line">(2)     &#125; # update = noop</span><br><span class="line">(2)     [exec] = noop</span><br><span class="line">(2)     policy remove_reply_message_if_eap &#123;</span><br><span class="line">(2)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message) &#123;</span><br><span class="line">(2)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message)  -&gt; FALSE</span><br><span class="line">(2)       else &#123;</span><br><span class="line">(2)         [noop] = noop</span><br><span class="line">(2)       &#125; # else = noop</span><br><span class="line">(2)     &#125; # policy remove_reply_message_if_eap = noop</span><br><span class="line">(2)   &#125; # post-auth = noop</span><br><span class="line">(2) Sent Access-Accept Id 16 from 127.0.0.1:1812 to 127.0.0.1:38424 length 0</span><br><span class="line">(2) Finished request</span><br><span class="line">Waking up in 4.9 seconds.</span><br><span class="line">(2) Cleaning up request packet ID 16 with timestamp +6169</span><br><span class="line">Ready to process requests</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>使用户不需用带域名就可以被识别，需要修改配置文件/etc/sssd/sssd.conf，将use_fully_qualified_names行的True值修改为False。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/sssd/sssd.conf</span><br><span class="line"></span><br><span class="line">use_fully_qualified_names = False</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>重启sssd服务，重新列出域控信息，登录格式可以和之前对比。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# systemctl restart sssd</span><br><span class="line"></span><br><span class="line">[root@centos8 ~]# realm list</span><br><span class="line">python.com</span><br><span class="line">  type: kerberos</span><br><span class="line">  realm-name: PYTHON.COM</span><br><span class="line">  domain-name: python.com</span><br><span class="line">  configured: kerberos-member</span><br><span class="line">  server-software: active-directory</span><br><span class="line">  client-software: sssd</span><br><span class="line">  required-package: oddjob</span><br><span class="line">  required-package: oddjob-mkhomedir</span><br><span class="line">  required-package: sssd</span><br><span class="line">  required-package: adcli</span><br><span class="line">  required-package: samba-common-tools</span><br><span class="line">  login-formats: %U</span><br><span class="line">  login-policy: allow-permitted-logins</span><br><span class="line">  permitted-logins:</span><br><span class="line">  permitted-groups: vpnusers</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>现在不用加域信息也能识别用户。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# id vpnuser</span><br><span class="line">uid=363201109(vpnuser) gid=363200513(domain users) 组=363200513(domain users),363201108(vpnusers)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<hr>
+<h2 id="五、安装和配置Google-Authenticator-PAM"><a href="#五、安装和配置Google-Authenticator-PAM" class="headerlink" title="五、安装和配置Google Authenticator PAM"></a>五、安装和配置Google Authenticator PAM</h2><h3 id="5-1-安装Google-Authenticator"><a href="#5-1-安装Google-Authenticator" class="headerlink" title="5.1 安装Google Authenticator"></a>5.1 安装Google Authenticator</h3><ul>
+<li>准备PAM编译环境<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# yum install pam-devel make gcc-c++ git</span><br><span class="line">[root@centos8 ~]# yum install automake autoconf libtool</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>下载安装文件，注意这里目录为<code>~</code><br><code>[root@centos8 ~]# git clone https://github.com/google/google-authenticator-libpam</code></li>
+</ul>
+<ul>
+<li>安装google-authenticator<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# cd google-authenticator-libpam/</span><br><span class="line">[root@centos8 google-authenticator-libpam]# ./bootstrap.sh</span><br><span class="line">[root@centos8 google-authenticator-libpam]# ./configure</span><br><span class="line">[root@centos8 google-authenticator-libpam]# make</span><br><span class="line">[root@centos8 google-authenticator-libpam]# make install</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h3 id="5-2-账号开启双因素认证"><a href="#5-2-账号开启双因素认证" class="headerlink" title="5.2 账号开启双因素认证"></a>5.2 账号开启双因素认证</h3><ul>
+<li>切换到ad账号<br><code>[root@centos8 ~]# su - vpnuser@python.com</code></li>
+</ul>
+<ul>
+<li>为账号开启双因素认证。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">[vpnuser@python.com@centos8 ~]$ google-authenticator</span><br><span class="line"></span><br><span class="line">Do you want authentication tokens to be time-based (y/n) y</span><br><span class="line">Warning: pasting the following URL into your browser exposes the OTP secret to Google:</span><br><span class="line">  https://www.google.com/chart?chs=200x200&amp;chld=M|0&amp;cht=qr&amp;chl=otpauth://totp/vpnuser@python.com@centos8%3Fsecret%3DOF2GUT37EUSG7Y2TYX57HKYRUY%26issuer%3Dcentos8</span><br><span class="line">Failed to use libqrencode to show QR code visually for scanning.</span><br><span class="line"></span><br><span class="line">如果安装了`libqrencode`，屏幕会出现一个二维码如果你的终端终端不支持显示二维码，可以手动打开这个网页链接（墙）来查看二维码或者手动输入后面的密钥（secret key）来代替扫描二维码，下面有5个紧急救助码（emergency scratch code），</span><br><span class="line">紧急救助码就是当你无法获取认证码时（比如手机丢了），可以当做认证码来用，每用一个少一个，但其实可以手动添加的，建议如果 root 账户使用 Google Authenticator 的话一定要把紧急救助码另外保存一份。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Consider typing the OTP secret into your app manually.</span><br><span class="line">Your new secret key is: OF2GUT37EUSG7Y2TYX57HKYRUY</span><br><span class="line">Enter code from app (-1 to skip): 198586</span><br><span class="line">Code confirmed</span><br><span class="line">Your emergency scratch codes are:</span><br><span class="line">  82763900</span><br><span class="line">  77203549</span><br><span class="line">  34651872</span><br><span class="line">  82841984</span><br><span class="line">  93446389</span><br><span class="line"></span><br><span class="line">Do you want me to update your &quot;/home/vpnuser@python.com/.google_authenticator&quot; file? (y/n) y</span><br><span class="line">是否更新用户的 Google Authenticator 配置文件，选择 y 才能使上面操作对当前用户生效，其实就是在对应用户的 Home 目录下生成了一个 .google_authenticator 文件，</span><br><span class="line">如果你想停用这个用户的 Google Authenticator 验证，只需要删除这个用户 Home 目录下的 .google_authenticator 文件就可以了。</span><br><span class="line"></span><br><span class="line">Do you want to disallow multiple uses of the same authentication</span><br><span class="line">token? This restricts you to one login about every 30s, but it increases</span><br><span class="line">your chances to notice or even prevent man-in-the-middle attacks (y/n) y</span><br><span class="line">每次生成的认证码是否同时只允许一个人使用？这里选择 y。</span><br><span class="line"></span><br><span class="line">By default, a new token is generated every 30 seconds by the mobile app.</span><br><span class="line">In order to compensate for possible time-skew between the client and the server,</span><br><span class="line">we allow an extra token before and after the current time. This allows for a</span><br><span class="line">time skew of up to 30 seconds between authentication server and client. If you</span><br><span class="line">experience problems with poor time synchronization, you can increase the window</span><br><span class="line">from its default size of 3 permitted codes (one previous code, the current</span><br><span class="line">code, the next code) to 17 permitted codes (the 8 previous codes, the current</span><br><span class="line">code, and the 8 next codes). This will permit for a time skew of up to 4 minutes</span><br><span class="line">between client and server.</span><br><span class="line">Do you want to do so? (y/n) y</span><br><span class="line">是否增加时间误差？这里选择 n或者y都行。</span><br><span class="line"></span><br><span class="line">If the computer that you are logging into isn&apos;t hardened against brute-force</span><br><span class="line">login attempts, you can enable rate-limiting for the authentication module.</span><br><span class="line">By default, this limits attackers to no more than 3 login attempts every 30s.</span><br><span class="line">Do you want to enable rate-limiting? (y/n) y</span><br><span class="line">是否启用次数限制？</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>上面的交互式的设置也可用通过参数一次性设置（推荐），先查看一下参数含义。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[vpnuser@python.com@centos8 ~]$google-authenticator -h</span><br><span class="line">google-authenticator [&lt;options&gt;]</span><br><span class="line"> -h, --help                     Print this message</span><br><span class="line"> -c, --counter-based            Set up counter-based (HOTP) verification</span><br><span class="line"> -C, --no-confirm               Don&apos;t confirm code. For non-interactive setups</span><br><span class="line"> -t, --time-based               Set up time-based (TOTP) verification</span><br><span class="line"> -d, --disallow-reuse           Disallow reuse of previously used TOTP tokens</span><br><span class="line"> -D, --allow-reuse              Allow reuse of previously used TOTP tokens</span><br><span class="line"> -f, --force                    Write file without first confirming with user</span><br><span class="line"> -l, --label=&lt;label&gt;            Override the default label in &quot;otpauth://&quot; URL</span><br><span class="line"> -i, --issuer=&lt;issuer&gt;          Override the default issuer in &quot;otpauth://&quot; URL</span><br><span class="line"> -q, --quiet                    Quiet mode</span><br><span class="line"> -Q, --qr-mode=&#123;NONE,ANSI,UTF8&#125; QRCode output mode</span><br><span class="line"> -r, --rate-limit=N             Limit logins to N per every M seconds</span><br><span class="line"> -R, --rate-time=M              Limit logins to N per every M seconds</span><br><span class="line"> -u, --no-rate-limit            Disable rate-limiting</span><br><span class="line"> -s, --secret=&lt;file&gt;            Specify a non-standard file location</span><br><span class="line"> -S, --step-size=S              Set interval between token refreshes</span><br><span class="line"> -w, --window-size=W            Set window of concurrently valid codes</span><br><span class="line"> -W, --minimal-window           Disable window of concurrently valid codes</span><br><span class="line"> -e, --emergency-codes=N        Number of emergency codes to generate</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>这里Cisco_VPN是会在APP上显示的令牌名标签，vpnuser@centos8是APP上的主机名标签。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[vpnuser@python.com@centos8 ~]$ google-authenticator -t -f -d -l vpnuser@centos8 -i Cisco_VPN -r 3 -R 30 -W</span><br><span class="line">Warning: pasting the following URL into your browser exposes the OTP secret to Google:</span><br><span class="line">  https://www.google.com/chart?chs=200x200&amp;chld=M|0&amp;cht=qr&amp;chl=otpauth://totp/lql@centos8%3Fsecret%3DJQ355PSUBG52KJBUMDJVBSMDLU%26issuer%3DLQL.ME</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h3 id="5-3-修改pam配置文件，并测试AD账号加动态码登录radius。"><a href="#5-3-修改pam配置文件，并测试AD账号加动态码登录radius。" class="headerlink" title="5.3 修改pam配置文件，并测试AD账号加动态码登录radius。"></a>5.3 修改pam配置文件，并测试AD账号加动态码登录radius。</h3><ul>
+<li>查找<code>pam_google_authenticator.so</code>所在目录<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# find / -name pam_google_authenticator.so</span><br><span class="line">/usr/local/lib/security/pam_google_authenticator.so</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>编辑<code>/etc/pam.d/radiusd</code>，告诉FreeRadius使用本地Unix密码和Google Authenticator代码对用户进行身份验证。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# vi /etc/pam.d/radiusd</span><br><span class="line"></span><br><span class="line">#%PAM-1.0</span><br><span class="line">#auth       include     password-auth</span><br><span class="line">#account    required    pam_nologin.so</span><br><span class="line">#account    include     password-auth</span><br><span class="line">#password   include     password-auth</span><br><span class="line">#session    include     password-auth</span><br><span class="line"></span><br><span class="line">auth       requisite    /usr/local/lib/security/pam_google_authenticator.so forward_pass</span><br><span class="line">auth       required     pam_sss.so use_first_pass</span><br><span class="line">account    required     pam_nologin.so</span><br><span class="line">account    include      password-auth</span><br><span class="line">session    include      password-auth</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>开启radius调试模式<br><code>[root@centos8 ~]#radius -X</code></li>
+</ul>
+<ul>
+<li>在新的窗口使用域账号测试radius认证，这里密码构成是<strong>密码+动态码</strong>。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# radtest vpnuser@python.com Cisc0123072009 localhost 18120 testing123</span><br><span class="line">Sent Access-Request Id 119 from 0.0.0.0:49063 to 127.0.0.1:1812 length 88</span><br><span class="line">        User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">        User-Password = &quot;Cisc0123072009&quot;</span><br><span class="line">        NAS-IP-Address = 172.20.29.110</span><br><span class="line">        NAS-Port = 18120</span><br><span class="line">        Message-Authenticator = 0x00</span><br><span class="line">        Cleartext-Password = &quot;Cisc0123072009&quot;</span><br><span class="line">Received Access-Accept Id 119 from 127.0.0.1:1812 to 127.0.0.1:49063 length 20</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>AD 结合动态码测试日志<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">(3) Received Access-Request Id 119 from 127.0.0.1:49063 to 127.0.0.1:1812 length 88</span><br><span class="line">(3)   User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">(3)   User-Password = &quot;Cisc0123072009&quot;</span><br><span class="line">(3)   NAS-IP-Address = 172.20.29.110</span><br><span class="line">(3)   NAS-Port = 18120</span><br><span class="line">(3)   Message-Authenticator = 0x457cc852a7cb00f054b1cc168f75998e</span><br><span class="line">(3) # Executing section authorize from file /etc/raddb/sites-enabled/default</span><br><span class="line">(3)   authorize &#123;</span><br><span class="line">(3)     policy filter_username &#123;</span><br><span class="line">(3)       if (&amp;User-Name) &#123;</span><br><span class="line">(3)       if (&amp;User-Name)  -&gt; TRUE</span><br><span class="line">(3)       if (&amp;User-Name)  &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ / /) &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ / /)  -&gt; FALSE</span><br><span class="line">(3)         if (&amp;User-Name =~ /@[^@]*@/ ) &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ /@[^@]*@/ )  -&gt; FALSE</span><br><span class="line">(3)         if (&amp;User-Name =~ /\.\./ ) &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ /\.\./ )  -&gt; FALSE</span><br><span class="line">(3)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))  &#123;</span><br><span class="line">(3)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))   -&gt; FALSE</span><br><span class="line">(3)         if (&amp;User-Name =~ /\.$/)  &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ /\.$/)   -&gt; FALSE</span><br><span class="line">(3)         if (&amp;User-Name =~ /@\./)  &#123;</span><br><span class="line">(3)         if (&amp;User-Name =~ /@\./)   -&gt; FALSE</span><br><span class="line">(3)       &#125; # if (&amp;User-Name)  = notfound</span><br><span class="line">(3)     &#125; # policy filter_username = notfound</span><br><span class="line">(3)     [preprocess] = ok</span><br><span class="line">(3)     [chap] = noop</span><br><span class="line">(3)     [mschap] = noop</span><br><span class="line">(3)     [digest] = noop</span><br><span class="line">(3) suffix: Checking for suffix after &quot;@&quot;</span><br><span class="line">(3) suffix: Looking up realm &quot;python.com&quot; for User-Name = &quot;vpnuser@python.com&quot;</span><br><span class="line">(3) suffix: No such realm &quot;python.com&quot;</span><br><span class="line">(3)     [suffix] = noop</span><br><span class="line">(3) eap: No EAP-Message, not doing EAP</span><br><span class="line">(3)     [eap] = noop</span><br><span class="line">(3) files: users: Matched entry DEFAULT at line 69</span><br><span class="line">(3)     [files] = ok</span><br><span class="line">(3)     [expiration] = noop</span><br><span class="line">(3)     [logintime] = noop</span><br><span class="line">(3) pap: WARNING: No &quot;known good&quot; password found for the user.  Not setting Auth-Type</span><br><span class="line">(3) pap: WARNING: Authentication will fail unless a &quot;known good&quot; password is available</span><br><span class="line">(3)     [pap] = noop</span><br><span class="line">(3)   &#125; # authorize = ok</span><br><span class="line">(3) Found Auth-Type = pam</span><br><span class="line">(3) # Executing group from file /etc/raddb/sites-enabled/default</span><br><span class="line">(3)   authenticate &#123;</span><br><span class="line">(3) pam: Using pamauth string &quot;radiusd&quot; for pam.conf lookup</span><br><span class="line">(3) pam: Authentication succeeded</span><br><span class="line">(3)     [pam] = ok</span><br><span class="line">(3)   &#125; # authenticate = ok</span><br><span class="line">(3) # Executing section post-auth from file /etc/raddb/sites-enabled/default</span><br><span class="line">(3)   post-auth &#123;</span><br><span class="line">(3)     update &#123;</span><br><span class="line">(3)       No attributes updated</span><br><span class="line">(3)     &#125; # update = noop</span><br><span class="line">(3)     [exec] = noop</span><br><span class="line">(3)     policy remove_reply_message_if_eap &#123;</span><br><span class="line">(3)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message) &#123;</span><br><span class="line">(3)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message)  -&gt; FALSE</span><br><span class="line">(3)       else &#123;</span><br><span class="line">(3)         [noop] = noop</span><br><span class="line">(3)       &#125; # else = noop</span><br><span class="line">(3)     &#125; # policy remove_reply_message_if_eap = noop</span><br><span class="line">(3)   &#125; # post-auth = noop</span><br><span class="line">(3) Sent Access-Accept Id 119 from 127.0.0.1:1812 to 127.0.0.1:49063 length 0</span><br><span class="line">(3) Finished request</span><br><span class="line">Waking up in 4.9 seconds.</span><br><span class="line">(3) Cleaning up request packet ID 119 with timestamp +6972</span><br><span class="line">Ready to process requests</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<hr>
+<h2 id="六、ASAv-AnyConnect-配置"><a href="#六、ASAv-AnyConnect-配置" class="headerlink" title="六、ASAv AnyConnect 配置"></a>六、ASAv AnyConnect 配置</h2><h3 id="6-1-ASAv初始化配置"><a href="#6-1-ASAv初始化配置" class="headerlink" title="6.1 ASAv初始化配置"></a>6.1 ASAv初始化配置</h3><ul>
+<li>ASAv接口初始化，这里我通过防火墙mgmt接口ssh网管。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">interface Management0/0</span><br><span class="line"> nameif mgmt</span><br><span class="line"> security-level 0</span><br><span class="line"> ip address 192.168.100.100 255.255.255.0</span><br><span class="line"></span><br><span class="line">ssh 0.0.0.0 0.0.0.0 mgmt</span><br><span class="line"></span><br><span class="line">interface GigabitEthernet0/0</span><br><span class="line"> nameif outside</span><br><span class="line"> security-level 0</span><br><span class="line"> ip address 202.100.1.254 255.255.255.0</span><br><span class="line">!</span><br><span class="line">interface GigabitEthernet0/1</span><br><span class="line"> nameif inside</span><br><span class="line"> security-level 100</span><br><span class="line"> ip address 192.168.1.254 255.255.255.0</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h3 id="6-2-ASAv上传AnyConnect镜像"><a href="#6-2-ASAv上传AnyConnect镜像" class="headerlink" title="6.2 ASAv上传AnyConnect镜像"></a>6.2 ASAv上传AnyConnect镜像</h3><ul>
+<li>开启http服务，创建本地管理密码，让ASDM可以顺利连接。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http server enable 8000</span><br><span class="line">http 0 0 mgmt</span><br><span class="line">aaa authentication http console LOCAL</span><br><span class="line">username admin password cisco privilege 15</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>ASDM上传AnyConnect镜像到ASAv本地。</li>
+</ul>
+<p><img src="https://i.imgur.com/GHYnhQV.png" alt="asdm-01"><br><img src="https://i.imgur.com/6JVzXTe.png" alt="asdm-02"><br><img src="https://i.imgur.com/aOKXihC.png" alt="asdm-03"><br><img src="https://i.imgur.com/jl3cuWs.png" alt="asdm-04"></p>
+<ul>
+<li>确认AnyConnect上传成功<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MFA-ASAv# dir</span><br><span class="line">Directory of disk0:/</span><br><span class="line">94     -rwx  41077110     08:07:22 Mar 05 2020  anyconnect-win-4.6.00362-webdeploy-k9.pkg</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h3 id="6-3-Cisco-ASAv-AnyConnect本地认证配置。"><a href="#6-3-Cisco-ASAv-AnyConnect本地认证配置。" class="headerlink" title="6.3 Cisco ASAv AnyConnect本地认证配置。"></a>6.3 Cisco ASAv AnyConnect本地认证配置。</h3><ul>
+<li><p>首先配置AnyConnect的本地认证，当本地认证测试通过之后，再将认证流量送到freeradius进行双因素认证。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">username ssluser password cisco</span><br><span class="line"></span><br><span class="line">webvpn</span><br><span class="line"> enable outside</span><br><span class="line"> anyconnect image disk0:/anyconnect-win-4.6.00362-webdeploy-k9.pkg 1</span><br><span class="line"> anyconnect enable</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>这里启用了隧道分隔。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">access-list anyconnect_split standard permit 192.168.1.0 255.255.255.0</span><br><span class="line">access-list anyconnect_filter_acl extended permit ip any 192.168.1.0 255.255.255.0</span><br><span class="line"></span><br><span class="line">ip local pool sslvpn_pool 192.168.50.100-192.168.50.200</span><br><span class="line"></span><br><span class="line">group-policy anyconnect_group_policy internal</span><br><span class="line">group-policy anyconnect_group_policy attributes</span><br><span class="line"> vpn-filter value anyconnect_filter_acl</span><br><span class="line"> vpn-tunnel-protocol ssl-client ssl-clientless</span><br><span class="line"> split-tunnel-policy tunnelspecified</span><br><span class="line"> split-tunnel-network-list value anyconnect_split</span><br><span class="line"> address-pools value sslvpn_pool</span><br><span class="line"> webvpn</span><br><span class="line">  anyconnect profiles value anyconnect_profile type user</span><br><span class="line"></span><br><span class="line">username ssluser attributes</span><br><span class="line"> vpn-group-policy anyconnect_group_policy</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>默认anyconnect不允许通过RDP的方式登录，这里我的管理机器是通过RDP登录的。所以需要修改anyconnect profile，让RDP用户能正常登录。</p>
+</li>
+</ul>
+<p><img src="https://i.imgur.com/tZ4WXkO.png" alt="rdp-01"></p>
+<p><img src="https://i.imgur.com/27Tys6P.png" alt="rdp-02"></p>
+<ul>
+<li>通过ASDM配置profile之后，通过命令行确认profile调用。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">group-policy anyconnect_group_policy attributes</span><br><span class="line"> webvpn</span><br><span class="line">  anyconnect profiles value anyconnect_profile type user</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h3 id="6-4-AnyConnect本地账号登录测试"><a href="#6-4-AnyConnect本地账号登录测试" class="headerlink" title="6.4 AnyConnect本地账号登录测试"></a>6.4 AnyConnect本地账号登录测试</h3><p><img src="https://i.imgur.com/yDldZQN.png" alt="login-01"><br><img src="https://i.imgur.com/Wd67FDT.png" alt="login-02.png"><br><img src="https://i.imgur.com/ikcoNOL.png" alt="login-03"></p>
+<h3 id="6-5-freeradius配置和测试"><a href="#6-5-freeradius配置和测试" class="headerlink" title="6.5 freeradius配置和测试"></a>6.5 freeradius配置和测试</h3><ul>
+<li>配置3A服务器指向freeradius。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">aaa-server freeradius protocol radius</span><br><span class="line">aaa-server freeradius (inside) host 192.168.1.10</span><br><span class="line"> key cisco</span><br><span class="line"> authentication-port 1812</span><br><span class="line"></span><br><span class="line">tunnel-group DefaultWEBVPNGroup general-attributes</span><br><span class="line"> authentication-server-group freeradius</span><br><span class="line"> default-group-policy anyconnect_group_policy</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>ASAv使用AD账号测试radius服务，因为之前修改过SSSD配置文件，这里是否添加<code>python.com</code>域名都可以。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">MFA-ASAv# test aaa-server authentication freeradius host 192.168.1.10 username vpnuser password Cisc0123187977</span><br><span class="line">INFO: Attempting Authentication test to IP address &lt;192.168.1.10&gt; (timeout: 12 seconds)</span><br><span class="line">INFO: Authentication Successful</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>radius调试模式看到的日志<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">Listening on acct address :: port 1813 bound to server default</span><br><span class="line">Listening on auth address 127.0.0.1 port 18120 bound to server inner-tunnel</span><br><span class="line">Listening on proxy address * port 54915</span><br><span class="line">Listening on proxy address :: port 45190</span><br><span class="line">Ready to process requests</span><br><span class="line">(0) Received Access-Request Id 4 from 192.168.1.254:30861 to 192.168.1.10:1812 length 86</span><br><span class="line">(0)   User-Name = &quot;vpnuser&quot;</span><br><span class="line">(0)   User-Password = &quot;Cisc0123187977&quot;</span><br><span class="line">(0)   NAS-IP-Address = 192.168.1.254</span><br><span class="line">(0)   NAS-Port = 4</span><br><span class="line">(0)   NAS-Port-Type = Virtual</span><br><span class="line">(0)   Cisco-AVPair = &quot;coa-push=true&quot;</span><br><span class="line">(0) # Executing section authorize from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   authorize &#123;</span><br><span class="line">(0)     policy filter_username &#123;</span><br><span class="line">(0)       if (&amp;User-Name) &#123;</span><br><span class="line">(0)       if (&amp;User-Name)  -&gt; TRUE</span><br><span class="line">(0)       if (&amp;User-Name)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ / /) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ / /)  -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /@[^@]*@/ ) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /@[^@]*@/ )  -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.\./ ) &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.\./ )  -&gt; FALSE</span><br><span class="line">(0)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))  &#123;</span><br><span class="line">(0)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))   -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.$/)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /\.$/)   -&gt; FALSE</span><br><span class="line">(0)         if (&amp;User-Name =~ /@\./)  &#123;</span><br><span class="line">(0)         if (&amp;User-Name =~ /@\./)   -&gt; FALSE</span><br><span class="line">(0)       &#125; # if (&amp;User-Name)  = notfound</span><br><span class="line">(0)     &#125; # policy filter_username = notfound</span><br><span class="line">(0)     [preprocess] = ok</span><br><span class="line">(0)     [chap] = noop</span><br><span class="line">(0)     [mschap] = noop</span><br><span class="line">(0)     [digest] = noop</span><br><span class="line">(0) suffix: Checking for suffix after &quot;@&quot;</span><br><span class="line">(0) suffix: No &apos;@&apos; in User-Name = &quot;vpnuser&quot;, looking up realm NULL</span><br><span class="line">(0) suffix: No such realm &quot;NULL&quot;</span><br><span class="line">(0)     [suffix] = noop</span><br><span class="line">(0) eap: No EAP-Message, not doing EAP</span><br><span class="line">(0)     [eap] = noop</span><br><span class="line">(0) files: users: Matched entry DEFAULT at line 69</span><br><span class="line">(0)     [files] = ok</span><br><span class="line">(0)     [expiration] = noop</span><br><span class="line">(0)     [logintime] = noop</span><br><span class="line">(0) pap: WARNING: No &quot;known good&quot; password found for the user.  Not setting Auth-Type</span><br><span class="line">(0) pap: WARNING: Authentication will fail unless a &quot;known good&quot; password is available</span><br><span class="line">(0)     [pap] = noop</span><br><span class="line">(0)   &#125; # authorize = ok</span><br><span class="line">(0) Found Auth-Type = pam</span><br><span class="line">(0) # Executing group from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   authenticate &#123;</span><br><span class="line">(0) pam: Using pamauth string &quot;radiusd&quot; for pam.conf lookup</span><br><span class="line">(0) pam: Authentication succeeded</span><br><span class="line">(0)     [pam] = ok</span><br><span class="line">(0)   &#125; # authenticate = ok</span><br><span class="line">(0) # Executing section post-auth from file /etc/raddb/sites-enabled/default</span><br><span class="line">(0)   post-auth &#123;![login-ad](https://i.imgur.com/yltINYr.png)</span><br><span class="line">(0)     update &#123;</span><br><span class="line">(0)       No attributes updated</span><br><span class="line">(0)     &#125; # update = noop</span><br><span class="line">(0)     [exec] = noop</span><br><span class="line">(0)     policy remove_reply_message_if_eap &#123;</span><br><span class="line">(0)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message) &#123;</span><br><span class="line">(0)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message)  -&gt; FALSE</span><br><span class="line">(0)       else &#123;</span><br><span class="line">(0)         [noop] = noop</span><br><span class="line">(0)       &#125; # else = noop</span><br><span class="line">(0)     &#125; # policy remove_reply_message_if_eap = noop</span><br><span class="line">(0)   &#125; # post-auth = noop</span><br><span class="line">(0) Sent Access-Accept Id 4 from 192.168.1.10:1812 to 192.168.1.254:30861 length 0</span><br><span class="line">(0) Finished request</span><br><span class="line">Waking up in 4.9 seconds.</span><br><span class="line">(0) Cleaning up request packet ID 4 with timestamp +11</span><br><span class="line">Ready to process requests</span><br></pre></td></tr></table></figure>
+
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>如果radius -X 无法运行，并且报错如下，一般是radius服务已经启动，占用了1812端口号导致的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Failed binding to auth address * port 1812 bound to server default: Address already in use</span><br><span class="line">/etc/raddb/sites-enabled/default[59]: Error binding to port for 0.0.0.0 port 1812</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看UDP端口号使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos8 ~]# ss -ulnp</span><br><span class="line">State  Recv-Q  Send-Q     Local Address:Port     Peer Address:Port</span><br><span class="line">UNCONN 0       0              127.0.0.1:18120         0.0.0.0:*      users:((&quot;radiusd&quot;,pid=15068,fd=14))</span><br><span class="line">UNCONN 0       0                0.0.0.0:1812          0.0.0.0:*      users:((&quot;radiusd&quot;,pid=15068,fd=10))</span><br><span class="line">UNCONN 0       0                0.0.0.0:1813          0.0.0.0:*      users:((&quot;radiusd&quot;,pid=15068,fd=11))</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>可以使用<code>pkill</code>命令结束radius所有进程。<br><code>[root@centos8 ~]# pkill radiusd</code></p>
+</li>
+</ul>
+<h3 id="6-6-使用-AD账号-动态码-登录AnyConnect"><a href="#6-6-使用-AD账号-动态码-登录AnyConnect" class="headerlink" title="6.6 使用 AD账号+动态码 登录AnyConnect"></a>6.6 使用 AD账号+动态码 登录AnyConnect</h3><ul>
+<li>AnyConnect输入密码时，首先输入AD密码，然后输入6位动态码。例如这里密码是<code>Cisc0123</code>，动态码是<code>914714</code>，那么密码框应该输入<code>Cisc0123914714</code>。</li>
+</ul>
+<p><img src="https://i.imgur.com/yDldZQN.png" alt="login-01"></p>
+<p><img src="https://i.imgur.com/Jk0wHuH.png" alt="login-ad"></p>
+<p><img src="https://i.imgur.com/ikcoNOL.png" alt="login-03"></p>
+<ul>
+<li>动态码</li>
+</ul>
+<p><img src="https://i.imgur.com/Ek8Ko1d.png" alt="code"></p>
+<ul>
+<li>AnyConnect登录，radius 调试日志。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">(4) Received Access-Request Id 8 from 192.168.1.254:30861 to 192.168.1.10:1812 length 666</span><br><span class="line">(4)   User-Name = &quot;vpnuser&quot;</span><br><span class="line">(4)   User-Password = &quot;Cisc0123914714&quot;</span><br><span class="line">(4)   NAS-Port = 32768</span><br><span class="line">(4)   Called-Station-Id = &quot;202.100.1.254&quot;</span><br><span class="line">(4)   Calling-Station-Id = &quot;202.100.1.10&quot;</span><br><span class="line">(4)   NAS-Port-Type = Virtual</span><br><span class="line">(4)   Tunnel-Client-Endpoint:0 = &quot;202.100.1.10&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-platform=win&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-mac=00-50-56-8e-14-a9&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-mac=00-50-56-8e-8a-ac&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-mac=00-50-56-8e-93-54&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-type=VMware, Inc. VMware7,1&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-platform-version=10.0.18362 &quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=ac-user-agent=AnyConnect Windows 4.6.00362&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;mdm-tlv=device-uid=D7237D73128E45F4F2706858D0F4AC09129E5131839298ACB03D3999125B5FC1&quot;</span><br><span class="line">(4)   NAS-IP-Address = 192.168.1.254</span><br><span class="line">(4)   Cisco-AVPair = &quot;audit-session-id=c0a801fe000080005e60c235&quot;</span><br><span class="line">(4)   Cisco-AVPair = &quot;ip:source-ip=202.100.1.10&quot;</span><br><span class="line">(4)   ASA-TunnelGroupName = &quot;DefaultWEBVPNGroup&quot;</span><br><span class="line">(4)   ASA-ClientType = AnyConnect-Client-SSL-VPN</span><br><span class="line">(4)   Cisco-AVPair = &quot;coa-push=true&quot;</span><br><span class="line">(4) # Executing section authorize from file /etc/raddb/sites-enabled/default</span><br><span class="line">(4)   authorize &#123;</span><br><span class="line">(4)     policy filter_username &#123;</span><br><span class="line">(4)       if (&amp;User-Name) &#123;</span><br><span class="line">(4)       if (&amp;User-Name)  -&gt; TRUE</span><br><span class="line">(4)       if (&amp;User-Name)  &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ / /) &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ / /)  -&gt; FALSE</span><br><span class="line">(4)         if (&amp;User-Name =~ /@[^@]*@/ ) &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ /@[^@]*@/ )  -&gt; FALSE</span><br><span class="line">(4)         if (&amp;User-Name =~ /\.\./ ) &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ /\.\./ )  -&gt; FALSE</span><br><span class="line">(4)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))  &#123;</span><br><span class="line">(4)         if ((&amp;User-Name =~ /@/) &amp;&amp; (&amp;User-Name !~ /@(.+)\.(.+)$/))   -&gt; FALSE</span><br><span class="line">(4)         if (&amp;User-Name =~ /\.$/)  &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ /\.$/)   -&gt; FALSE</span><br><span class="line">(4)         if (&amp;User-Name =~ /@\./)  &#123;</span><br><span class="line">(4)         if (&amp;User-Name =~ /@\./)   -&gt; FALSE</span><br><span class="line">(4)       &#125; # if (&amp;User-Name)  = notfound</span><br><span class="line">(4)     &#125; # policy filter_username = notfound</span><br><span class="line">(4)     [preprocess] = ok</span><br><span class="line">(4)     [chap] = noop</span><br><span class="line">(4)     [mschap] = noop</span><br><span class="line">(4)     [digest] = noop</span><br><span class="line">(4) suffix: Checking for suffix after &quot;@&quot;</span><br><span class="line">(4) suffix: No &apos;@&apos; in User-Name = &quot;vpnuser&quot;, looking up realm NULL</span><br><span class="line">(4) suffix: No such realm &quot;NULL&quot;</span><br><span class="line">(4)     [suffix] = noop</span><br><span class="line">(4) eap: No EAP-Message, not doing EAP</span><br><span class="line">(4)     [eap] = noop</span><br><span class="line">(4) files: users: Matched entry DEFAULT at line 69</span><br><span class="line">(4)     [files] = ok</span><br><span class="line">(4)     [expiration] = noop</span><br><span class="line">(4)     [logintime] = noop</span><br><span class="line">(4) pap: WARNING: No &quot;known good&quot; password found for the user.  Not setting Auth-Type</span><br><span class="line">(4) pap: WARNING: Authentication will fail unless a &quot;known good&quot; password is available</span><br><span class="line">(4)     [pap] = noop</span><br><span class="line">(4)   &#125; # authorize = ok</span><br><span class="line">(4) Found Auth-Type = pam</span><br><span class="line">(4) # Executing group from file /etc/raddb/sites-enabled/default</span><br><span class="line">(4)   authenticate &#123;</span><br><span class="line">(4) pam: Using pamauth string &quot;radiusd&quot; for pam.conf lookup</span><br><span class="line">(4) pam: Authentication succeeded</span><br><span class="line">(4)     [pam] = ok</span><br><span class="line">(4)   &#125; # authenticate = ok</span><br><span class="line">(4) # Executing section post-auth from file /etc/raddb/sites-enabled/default</span><br><span class="line">(4)   post-auth &#123;</span><br><span class="line">(4)     update &#123;</span><br><span class="line">(4)       No attributes updated</span><br><span class="line">(4)     &#125; # update = noop</span><br><span class="line">(4)     [exec] = noop</span><br><span class="line">(4)     policy remove_reply_message_if_eap &#123;</span><br><span class="line">(4)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message) &#123;</span><br><span class="line">(4)       if (&amp;reply:EAP-Message &amp;&amp; &amp;reply:Reply-Message)  -&gt; FALSE</span><br><span class="line">(4)       else &#123;</span><br><span class="line">(4)         [noop] = noop</span><br><span class="line">(4)       &#125; # else = noop</span><br><span class="line">(4)     &#125; # policy remove_reply_message_if_eap = noop</span><br><span class="line">(4)   &#125; # post-auth = noop</span><br><span class="line">(4) Sent Access-Accept Id 8 from 192.168.1.10:1812 to 192.168.1.254:30861 length 0</span><br><span class="line">(4) Finished request</span><br><span class="line">Waking up in 4.9 seconds.</span><br><span class="line">(4) Cleaning up request packet ID 8 with timestamp +608</span><br><span class="line">Ready to process requests</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/05/Python-SNMP%E5%8D%8F%E8%AE%AE/" rel="prev" title="Python SNMP协议">
+      <i class="fa fa-chevron-left"></i> Python SNMP协议
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Cisco-AnyConnect-with-FreeRADIUS集成域账号-谷歌双因素认证"><span class="nav-number">1.</span> <span class="nav-text">Cisco AnyConnect with FreeRADIUS集成域账号+谷歌双因素认证</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、环境介绍"><span class="nav-number">1.1.</span> <span class="nav-text">一、环境介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、CentOS8-环境设置"><span class="nav-number">1.2.</span> <span class="nav-text">二、CentOS8 环境设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、FreeRADIUS-安装及配置"><span class="nav-number">1.3.</span> <span class="nav-text">三、FreeRADIUS 安装及配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-FreeRADIUS安装"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 FreeRADIUS安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-FreeRADIUS修改配置文件"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 FreeRADIUS修改配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-FreeRADIUS-服务测试"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.1 FreeRADIUS 服务测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、SSSD安装配置"><span class="nav-number">1.4.</span> <span class="nav-text">四、SSSD安装配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、安装和配置Google-Authenticator-PAM"><span class="nav-number">1.5.</span> <span class="nav-text">五、安装和配置Google Authenticator PAM</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-安装Google-Authenticator"><span class="nav-number">1.5.1.</span> <span class="nav-text">5.1 安装Google Authenticator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-账号开启双因素认证"><span class="nav-number">1.5.2.</span> <span class="nav-text">5.2 账号开启双因素认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-修改pam配置文件，并测试AD账号加动态码登录radius。"><span class="nav-number">1.5.3.</span> <span class="nav-text">5.3 修改pam配置文件，并测试AD账号加动态码登录radius。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、ASAv-AnyConnect-配置"><span class="nav-number">1.6.</span> <span class="nav-text">六、ASAv AnyConnect 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-ASAv初始化配置"><span class="nav-number">1.6.1.</span> <span class="nav-text">6.1 ASAv初始化配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-ASAv上传AnyConnect镜像"><span class="nav-number">1.6.2.</span> <span class="nav-text">6.2 ASAv上传AnyConnect镜像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-3-Cisco-ASAv-AnyConnect本地认证配置。"><span class="nav-number">1.6.3.</span> <span class="nav-text">6.3 Cisco ASAv AnyConnect本地认证配置。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-4-AnyConnect本地账号登录测试"><span class="nav-number">1.6.4.</span> <span class="nav-text">6.4 AnyConnect本地账号登录测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-5-freeradius配置和测试"><span class="nav-number">1.6.5.</span> <span class="nav-text">6.5 freeradius配置和测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-6-使用-AD账号-动态码-登录AnyConnect"><span class="nav-number">1.6.6.</span> <span class="nav-text">6.6 使用 AD账号+动态码 登录AnyConnect</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">crosswalk</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">crosswalk</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

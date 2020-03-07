@@ -14,7 +14,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
 <script id="hexo-configurations">
@@ -22,17 +22,18 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="WLC HA 升级步骤[TOC]">
+  <meta name="description" content="这里介绍了Cisco WLC 5520在HA模式下系统升级和AP升级的过程。">
+<meta name="keywords" content="Cisco WLC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="WLC HA 升级步骤">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;07&#x2F;WLC-HA-%E5%8D%87%E7%BA%A7%E6%AD%A5%E9%AA%A4&#x2F;index.html">
 <meta property="og:site_name" content="Crosswalk Blog">
-<meta property="og:description" content="WLC HA 升级步骤[TOC]">
+<meta property="og:description" content="这里介绍了Cisco WLC 5520在HA模式下系统升级和AP升级的过程。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="en-resource:&#x2F;&#x2F;database&#x2F;4173:1">
-<meta property="og:updated_time" content="2019-11-07T08:09:33.279Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;TpDUXWf.png">
+<meta property="og:updated_time" content="2020-03-07T07:48:05.871Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="en-resource:&#x2F;&#x2F;database&#x2F;4173:1">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;i.imgur.com&#x2F;TpDUXWf.png">
 
 <link rel="canonical" href="http://yoursite.com/2019/11/07/WLC-HA-%E5%8D%87%E7%BA%A7%E6%AD%A5%E9%AA%A4/">
 
@@ -208,9 +209,24 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2019-11-07 16:07:45 / 修改时间：16:09:33" itemprop="dateCreated datePublished" datetime="2019-11-07T16:07:45+08:00">2019-11-07</time>
+              <time title="创建时间：2019-11-07 16:07:45" itemprop="dateCreated datePublished" datetime="2019-11-07T16:07:45+08:00">2019-11-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-07 15:48:05" itemprop="dateModified" datetime="2020-03-07T15:48:05+08:00">2020-03-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cisco/" itemprop="url" rel="index"><span itemprop="name">Cisco</span></a>
+                </span>
             </span>
 
           
@@ -245,8 +261,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="WLC-HA-升级步骤"><a href="#WLC-HA-升级步骤" class="headerlink" title="WLC HA 升级步骤"></a>WLC HA 升级步骤</h1><p>[TOC]</p>
-<h2 id="上传升级镜像"><a href="#上传升级镜像" class="headerlink" title="上传升级镜像"></a>上传升级镜像</h2><p>通过FTP上传镜像到WLC<br><img src="en-resource://database/4173:1" alt="317b6074a7b7fd63615c26cd8ac6af37.png"></p>
+        <blockquote>
+<p>这里介绍了Cisco WLC 5520在HA模式下系统升级和AP升级的过程。</p>
+</blockquote>
+<h2 id="上传升级镜像"><a href="#上传升级镜像" class="headerlink" title="上传升级镜像"></a>上传升级镜像</h2><p>通过FTP上传镜像到WLC<br><img src="https://i.imgur.com/TpDUXWf.png" alt="WLC通过FTP上传镜像"></p>
 <h2 id="查看镜像上传成功"><a href="#查看镜像上传成功" class="headerlink" title="查看镜像上传成功"></a>查看镜像上传成功</h2><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(Cisco Controller) &gt;show boot</span><br><span class="line">Primary Boot Image<span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span>. 8.5.151.0 (default)</span><br><span class="line">Backup Boot Image<span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span> 8.5.140.0 (active)</span><br></pre></td></tr></table></figure>
 
 
@@ -288,6 +306,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Cisco-WLC/" rel="tag"># Cisco WLC</a>
+          </div>
 
         
 
@@ -362,7 +383,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#WLC-HA-升级步骤"><span class="nav-text">WLC HA 升级步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#上传升级镜像"><span class="nav-text">上传升级镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看镜像上传成功"><span class="nav-text">查看镜像上传成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看AP当前运行版本"><span class="nav-text">查看AP当前运行版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送新镜像到AP"><span class="nav-text">推送新镜像到AP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看推送过程"><span class="nav-text">查看推送过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送成功"><span class="nav-text">推送成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确认WLC-HA-状态正常"><span class="nav-text">确认WLC HA 状态正常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重启WLC"><span class="nav-text">重启WLC</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#上传升级镜像"><span class="nav-text">上传升级镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看镜像上传成功"><span class="nav-text">查看镜像上传成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看AP当前运行版本"><span class="nav-text">查看AP当前运行版本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送新镜像到AP"><span class="nav-text">推送新镜像到AP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看推送过程"><span class="nav-text">查看推送过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#推送成功"><span class="nav-text">推送成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#确认WLC-HA-状态正常"><span class="nav-text">确认WLC HA 状态正常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重启WLC"><span class="nav-text">重启WLC</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -385,13 +406,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

@@ -14,7 +14,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
 <script id="hexo-configurations">
@@ -22,14 +22,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片">
+  <meta name="description" content="对SNMP协议做了简单的介绍，主要介绍Python对SNMP协议的交互。">
+<meta name="keywords" content="Python,SNMP">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python SNMP协议">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;05&#x2F;Python-SNMP%E5%8D%8F%E8%AE%AE&#x2F;index.html">
 <meta property="og:site_name" content="Crosswalk Blog">
-<meta property="og:description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片">
+<meta property="og:description" content="对SNMP协议做了简单的介绍，主要介绍Python对SNMP协议的交互。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-12-05T01:38:40.772Z">
+<meta property="og:updated_time" content="2020-03-07T07:38:41.071Z">
 <meta name="twitter:card" content="summary">
 
 <link rel="canonical" href="http://yoursite.com/2019/12/05/Python-SNMP%E5%8D%8F%E8%AE%AE/">
@@ -206,10 +207,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2019-12-05 09:35:41 / 修改时间：09:38:40" itemprop="dateCreated datePublished" datetime="2019-12-05T09:35:41+08:00">2019-12-05</time>
+              <time title="创建时间：2019-12-05 09:35:41" itemprop="dateCreated datePublished" datetime="2019-12-05T09:35:41+08:00">2019-12-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-03-07 15:38:41" itemprop="dateModified" datetime="2020-03-07T15:38:41+08:00">2020-03-07</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -252,8 +259,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Python-SNMP-协议"><a href="#Python-SNMP-协议" class="headerlink" title="Python SNMP 协议"></a>Python SNMP 协议</h1><p>SNMPv2 明文图片<br>view表示节点图片<br>SNMP 统一包格式图片</p>
-<p>[toc]</p>
+        <blockquote>
+<p>对SNMP协议做了简单的介绍，主要介绍Python对SNMP协议的交互。</p>
+</blockquote>
 <h2 id="1-理论"><a href="#1-理论" class="headerlink" title="1.理论"></a>1.理论</h2><h3 id="SNMP-三大组件"><a href="#SNMP-三大组件" class="headerlink" title="SNMP 三大组件"></a>SNMP 三大组件</h3><ul>
 <li><p>SNMP Manager，也就是SNMP服务器（Network Management Server NMS），比如PI，solarwinds，运行Python脚本的 SNMP 服务器。</p>
 </li>
@@ -359,6 +367,10 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Python/" rel="tag"># Python</a>
+              <a href="/tags/SNMP/" rel="tag"># SNMP</a>
+          </div>
 
         
 
@@ -433,7 +445,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-SNMP-协议"><span class="nav-text">Python SNMP 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-理论"><span class="nav-text">1.理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-三大组件"><span class="nav-text">SNMP 三大组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv1-v2-信息"><span class="nav-text">SNMPv1 / v2 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SNMP-基本操作与MIB"><span class="nav-text">2.SNMP 基本操作与MIB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv2-基本配置"><span class="nav-text">SNMPv2 基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv3-基本配置"><span class="nav-text">SNMPv3 基本配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SNMP-七种操作"><span class="nav-text">3.SNMP 七种操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-统一报文格式"><span class="nav-text">SNMP 统一报文格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作类型"><span class="nav-text">操作类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SNMPv2-Python实现"><span class="nav-text">4.SNMPv2 Python实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-SNMPv3-Python实现"><span class="nav-text">5.SNMPv3 Python实现</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-理论"><span class="nav-text">1.理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-三大组件"><span class="nav-text">SNMP 三大组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv1-v2-信息"><span class="nav-text">SNMPv1 / v2 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SNMP-基本操作与MIB"><span class="nav-text">2.SNMP 基本操作与MIB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv2-基本配置"><span class="nav-text">SNMPv2 基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv3-基本配置"><span class="nav-text">SNMPv3 基本配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SNMP-七种操作"><span class="nav-text">3.SNMP 七种操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-统一报文格式"><span class="nav-text">SNMP 统一报文格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作类型"><span class="nav-text">操作类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SNMPv2-Python实现"><span class="nav-text">4.SNMPv2 Python实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-SNMPv3-Python实现"><span class="nav-text">5.SNMPv3 Python实现</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -456,13 +468,13 @@
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">5</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

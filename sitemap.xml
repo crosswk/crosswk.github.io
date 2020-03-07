@@ -2,9 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yoursite.com/2020/03/05/Cisco-ASAv-AD-FreeRADIUS-Google-MFA/</loc>
+    <loc>http://yoursite.com/2020/03/06/Cisco-AnyConnect-%25E9%2580%259A%25E8%25BF%2587FreeRADIUS%25E9%259B%2586%25E6%2588%2590%25E5%259F%259F%25E8%25B4%25A6%25E5%258F%25B7-%25E8%25B0%25B7%25E6%25AD%258C%25E5%258F%258C%25E5%259B%25A0%25E7%25B4%25A0%25E8%25AE%25A4%25E8%25AF%2581/</loc>
     
-    <lastmod>2020-03-05T14:08:58.117Z</lastmod>
+    <lastmod>2020-03-06T12:48:55.655Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/categories/index.html</loc>
+    
+    <lastmod>2020-03-06T04:31:58.966Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/index.html</loc>
+    
+    <lastmod>2020-03-06T04:26:06.698Z</lastmod>
     
   </url>
   
@@ -26,13 +40,6 @@
     <loc>http://yoursite.com/2019/11/07/markdown/</loc>
     
     <lastmod>2019-11-07T02:57:49.519Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/2019/11/06/post-title/</loc>
-    
-    <lastmod>2019-11-06T06:26:17.527Z</lastmod>
     
   </url>
   

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
@@ -9,6 +9,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
 
 <link rel="stylesheet" href="/css/main.css">
 
@@ -17,16 +19,16 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Gemini","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片 [toc] 1.理论SNMP 三大组件 SNMP Manager，也就是SNMP服务器（Network Management Server NMS），比如PI，solarwinds，运行Python脚本的 SNMP 服务器。  SNMP Agent，被网管的设备，比如路由器，交换机和服务器。  Mana">
+  <meta name="description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Python SNMP协议">
 <meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;05&#x2F;Python-SNMP%E5%8D%8F%E8%AE%AE&#x2F;index.html">
-<meta property="og:site_name" content="人行横道">
-<meta property="og:description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片 [toc] 1.理论SNMP 三大组件 SNMP Manager，也就是SNMP服务器（Network Management Server NMS），比如PI，solarwinds，运行Python脚本的 SNMP 服务器。  SNMP Agent，被网管的设备，比如路由器，交换机和服务器。  Mana">
-<meta property="og:locale" content="en">
+<meta property="og:site_name" content="Crosswalk Blog">
+<meta property="og:description" content="Python SNMP 协议SNMPv2 明文图片view表示节点图片SNMP 统一包格式图片">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2019-12-05T01:38:40.772Z">
 <meta name="twitter:card" content="summary">
 
@@ -42,7 +44,7 @@
   };
 </script>
 
-  <title>Python SNMP协议 | 人行横道</title>
+  <title>Python SNMP协议 | Crosswalk Blog</title>
   
 
 
@@ -82,7 +84,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
+    <div class="toggle" aria-label="切换导航栏">
       <span class="toggle-line toggle-line-first"></span>
       <span class="toggle-line toggle-line-middle"></span>
       <span class="toggle-line toggle-line-last"></span>
@@ -94,7 +96,7 @@
     <div>
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">人行横道</span>
+        <span class="site-title">Crosswalk Blog</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -102,6 +104,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -112,17 +115,52 @@
   <ul id="menu" class="menu">
         <li class="menu-item menu-item-home">
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-crosswalk blog"></i>Home</a>
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
 
   </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
   </ul>
 
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
 </div>
     </header>
 
@@ -145,44 +183,65 @@
       
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="en">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/05/Python-SNMP%E5%8D%8F%E8%AE%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="crosswalk">
+      <meta itemprop="image" content="/images/me.jpg">
+      <meta itemprop="name" content="Liu Qianglong">
       <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="人行横道">
+      <meta itemprop="name" content="Crosswalk Blog">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
+        <h2 class="post-title" itemprop="name headline">
           Python SNMP协议
-        </h1>
+        </h2>
 
         <div class="post-meta">
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
               </span>
-              <span class="post-meta-item-text">Posted on</span>
+              <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="Created: 2019-12-05 09:35:41 / Modified: 09:38:40" itemprop="dateCreated datePublished" datetime="2019-12-05T09:35:41+08:00">2019-12-05</time>
+              <time title="创建时间：2019-12-05 09:35:41 / 修改时间：09:38:40" itemprop="dateCreated datePublished" datetime="2019-12-05T09:35:41+08:00">2019-12-05</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
-              <span class="post-meta-item-text">In</span>
+              <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/Python/" itemprop="url" rel="index"><span itemprop="name">Python</span></a>
                 </span>
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/12/05/Python-SNMP%E5%8D%8F%E8%AE%AE/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2019/12/05/Python-SNMP%E5%8D%8F%E8%AE%AE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
 
         </div>
       </header>
@@ -215,17 +274,17 @@
 <p>v1/v2 几乎没有安全性，没有加密，没有认证，只是存在一个<code>community</code>字符串，但是这个字符串还是<strong>明文的</strong>。而且很多设备激活了默认的community，默认的<code>public</code>有读写权限，默认的<code>private</code>有读权限。</p>
 <p>V3 提供完整的安全性保障，支持认证和加密。</p>
 <h2 id="2-SNMP-基本操作与MIB"><a href="#2-SNMP-基本操作与MIB" class="headerlink" title="2.SNMP 基本操作与MIB"></a>2.SNMP 基本操作与MIB</h2><h3 id="SNMPv2-基本配置"><a href="#SNMPv2-基本配置" class="headerlink" title="SNMPv2 基本配置"></a>SNMPv2 基本配置</h3><p>这里<code>R1</code>是trap community，一般不会设置，服务器只有匹配了这个community才能收这个trap消息。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">snmp-server community nwcd_test_ro ro</span><br><span class="line">snmp-server community nwcd_test_rw rw</span><br><span class="line"></span><br><span class="line">snmp-server location beijing_indigo</span><br><span class="line">snmp-server contact qianglongliu</span><br><span class="line"># 联系人</span><br><span class="line"></span><br><span class="line">snmp-server enable traps</span><br><span class="line"># 激活所有能激活的trap</span><br><span class="line"></span><br><span class="line">snmp-server enable traps snmp linkdown linkup</span><br><span class="line"># 只激活接口up down</span><br><span class="line"></span><br><span class="line">snmp-server host 10.1.1.100 version 2c R1</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">snmp-server<span class="built_in"> community </span>nwcd_test_ro ro</span><br><span class="line">snmp-server<span class="built_in"> community </span>nwcd_test_rw rw</span><br><span class="line"></span><br><span class="line">snmp-server location beijing_indigo</span><br><span class="line">snmp-server contact qianglongliu</span><br><span class="line"><span class="comment"># 联系人</span></span><br><span class="line"></span><br><span class="line">snmp-server <span class="builtin-name">enable</span> traps</span><br><span class="line"><span class="comment"># 激活所有能激活的trap</span></span><br><span class="line"></span><br><span class="line">snmp-server <span class="builtin-name">enable</span> traps<span class="built_in"> snmp </span>linkdown linkup</span><br><span class="line"><span class="comment"># 只激活接口up down</span></span><br><span class="line"></span><br><span class="line">snmp-server host 10.1.1.100 version 2c R1</span><br></pre></td></tr></table></figure>
 
 
 <h3 id="SNMPv3-基本配置"><a href="#SNMPv3-基本配置" class="headerlink" title="SNMPv3 基本配置"></a>SNMPv3 基本配置</h3><p>如果只是对设备进行认证加密，使用下面的命令即可完成。<code>priv</code>表示既做认证又做加密。<br>但是对用户的权限没有进行控制。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">snmp-server group nwcd_test_group v3 priv </span><br><span class="line">snmp-server user nwcd_test_user nwcd_test_group v3 auth sha Cisc0123 priv des Cisc0123</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">snmp-server<span class="built_in"> group </span>nwcd_test_group v3 priv </span><br><span class="line">snmp-server<span class="built_in"> user </span>nwcd_test_user nwcd_test_group v3 auth sha Cisc0123 priv des Cisc0123</span><br></pre></td></tr></table></figure>
 
 <p>配置路由器在5分钟内CPU总利用率超过20%时发送Trap信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">R1(config)#process cpu threshold type total rising 20 interval 5</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">R1(config)#process cpu threshold<span class="built_in"> type </span>total rising 20 interval 5</span><br></pre></td></tr></table></figure>
 
 <p>可以使用<code>view</code>来限制用户的权限访问，<code>view</code>是节点范围的名字。<code>internet</code>和<code>inclouded</code>都是节点的名字。让这个组只能读取节点往下的oid信息。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">snmp-server view nwcd_view internet included</span><br><span class="line">snmp-server group nwcd_test_group v3 priv read nwcd_view_read write nwcd_view_write</span><br><span class="line">snmp-server user nwcd_test_user nwcd_test_group v3 auth sha Cisc0123 priv des Cisc0123</span><br><span class="line"></span><br><span class="line">snmp-server enable traps config</span><br><span class="line"># 进入和退出config模式会触发trap</span><br><span class="line"></span><br><span class="line">snmp-server enable traps syslog</span><br><span class="line"># CPU超过阈值会触发trap</span><br><span class="line"></span><br><span class="line">snmp-server host 10.1.1.10 version 3 priv nwcd_test_user</span><br><span class="line"># 这里使用nwcd_test_test这个用户的认证和加密方式。</span><br></pre></td></tr></table></figure>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">snmp-server view nwcd_view internet included</span><br><span class="line">snmp-server<span class="built_in"> group </span>nwcd_test_group v3 priv read nwcd_view_read write nwcd_view_write</span><br><span class="line">snmp-server<span class="built_in"> user </span>nwcd_test_user nwcd_test_group v3 auth sha Cisc0123 priv des Cisc0123</span><br><span class="line"></span><br><span class="line">snmp-server <span class="builtin-name">enable</span> traps config</span><br><span class="line"><span class="comment"># 进入和退出config模式会触发trap</span></span><br><span class="line"></span><br><span class="line">snmp-server <span class="builtin-name">enable</span> traps syslog</span><br><span class="line"><span class="comment"># CPU超过阈值会触发trap</span></span><br><span class="line"></span><br><span class="line">snmp-server host 10.1.1.10 version 3 priv nwcd_test_user</span><br><span class="line"><span class="comment"># 这里使用nwcd_test_test这个用户的认证和加密方式。</span></span><br></pre></td></tr></table></figure>
 <p>注意，<strong>如果cisco上既配置SNMPv1 v2 和 v3，OIDView软件会优先选择v1和v2</strong>。</p>
 <h2 id="3-SNMP-七种操作"><a href="#3-SNMP-七种操作" class="headerlink" title="3.SNMP 七种操作"></a>3.SNMP 七种操作</h2><h3 id="SNMP-统一报文格式"><a href="#SNMP-统一报文格式" class="headerlink" title="SNMP 统一报文格式"></a>SNMP 统一报文格式</h3><p>SNMP基于UDP端口<code>161</code> 和<code>162</code>，Get Set是161，Trap是162。</p>
 <h3 id="操作类型"><a href="#操作类型" class="headerlink" title="操作类型"></a>操作类型</h3><ol>
@@ -281,7 +340,7 @@
 </ol>
 <ul>
 <li>trap是没有确认机制的，主要为了解决trap没有确认机制的问题。<strong>Agent发送一个Inform消息，服务器需要回复</strong>。服务器<strong>回复get-response报文</strong>，报文内容就是客户端发过来的东西，相当于确认。</li>
-<li>这里加上<code>informs</code>，讲trap类型改为inform类型，增加确认机制。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">snmp-server host 10.1.1.1 informs version 2c R1`</span><br></pre></td></tr></table></figure>
+<li>这里加上<code>informs</code>，讲trap类型改为inform类型，增加确认机制。<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">snmp-server host <span class="number">10.1</span><span class="number">.1</span><span class="number">.1</span> informs version <span class="number">2</span>c R1`</span><br></pre></td></tr></table></figure>
 
 </li>
 </ul>
@@ -311,8 +370,8 @@
       <i class="fa fa-chevron-left"></i> WLC HA 升级步骤
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/03/05/Cisco-ASAv-AD-FreeRADIUS-Google-MFA/" rel="next" title="Cisco-ASAv-AD-FreeRADIUS-Google-MFA">
-      Cisco-ASAv-AD-FreeRADIUS-Google-MFA <i class="fa fa-chevron-right"></i>
+    <a href="/2020/03/06/Cisco-AnyConnect-%E9%80%9A%E8%BF%87FreeRADIUS%E9%9B%86%E6%88%90%E5%9F%9F%E8%B4%A6%E5%8F%B7-%E8%B0%B7%E6%AD%8C%E5%8F%8C%E5%9B%A0%E7%B4%A0%E8%AE%A4%E8%AF%81/" rel="next" title="Cisco AnyConnect 通过FreeRADIUS集成域账号+谷歌双因素认证">
+      Cisco AnyConnect 通过FreeRADIUS集成域账号+谷歌双因素认证 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -327,6 +386,7 @@
 
           </div>
           
+    <div class="comments" id="valine-comments"></div>
 
 <script>
   window.addEventListener('tabs:register', () => {
@@ -364,22 +424,24 @@
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
-          Table of Contents
+          文章目录
         </li>
         <li class="sidebar-nav-overview">
-          Overview
+          站点概览
         </li>
       </ul>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-SNMP-协议"><span class="nav-number">1.</span> <span class="nav-text">Python SNMP 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-理论"><span class="nav-number">1.1.</span> <span class="nav-text">1.理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-三大组件"><span class="nav-number">1.1.1.</span> <span class="nav-text">SNMP 三大组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv1-v2-信息"><span class="nav-number">1.1.2.</span> <span class="nav-text">SNMPv1 / v2 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SNMP-基本操作与MIB"><span class="nav-number">1.2.</span> <span class="nav-text">2.SNMP 基本操作与MIB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv2-基本配置"><span class="nav-number">1.2.1.</span> <span class="nav-text">SNMPv2 基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv3-基本配置"><span class="nav-number">1.2.2.</span> <span class="nav-text">SNMPv3 基本配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SNMP-七种操作"><span class="nav-number">1.3.</span> <span class="nav-text">3.SNMP 七种操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-统一报文格式"><span class="nav-number">1.3.1.</span> <span class="nav-text">SNMP 统一报文格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作类型"><span class="nav-number">1.3.2.</span> <span class="nav-text">操作类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SNMPv2-Python实现"><span class="nav-number">1.4.</span> <span class="nav-text">4.SNMPv2 Python实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-SNMPv3-Python实现"><span class="nav-number">1.5.</span> <span class="nav-text">5.SNMPv3 Python实现</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Python-SNMP-协议"><span class="nav-text">Python SNMP 协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-理论"><span class="nav-text">1.理论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-三大组件"><span class="nav-text">SNMP 三大组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv1-v2-信息"><span class="nav-text">SNMPv1 / v2 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SNMP-基本操作与MIB"><span class="nav-text">2.SNMP 基本操作与MIB</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv2-基本配置"><span class="nav-text">SNMPv2 基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMPv3-基本配置"><span class="nav-text">SNMPv3 基本配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SNMP-七种操作"><span class="nav-text">3.SNMP 七种操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SNMP-统一报文格式"><span class="nav-text">SNMP 统一报文格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作类型"><span class="nav-text">操作类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-SNMPv2-Python实现"><span class="nav-text">4.SNMPv2 Python实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-SNMPv3-Python实现"><span class="nav-text">5.SNMPv3 Python实现</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
       <div class="site-overview-wrap sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">crosswalk</p>
+    <img class="site-author-image" itemprop="image" alt="Liu Qianglong"
+      src="/images/me.jpg">
+  <p class="site-author-name" itemprop="name">Liu Qianglong</p>
   <div class="site-description" itemprop="description"></div>
 </div>
 <div class="site-state-wrap motion-element">
@@ -387,16 +449,32 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
-          <span class="site-state-item-name">posts</span>
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-        <span class="site-state-item-count">3</span>
-        <span class="site-state-item-name">categories</span>
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
 </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/crosswk" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;crosswk" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/liuqianglong@outlook.com" title="E-Mail → liuqianglong@outlook.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
 
 
 
@@ -414,6 +492,7 @@
       <div class="footer-inner">
         
 
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 <div class="copyright">
   
   &copy; 
@@ -421,15 +500,38 @@
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-  <span class="author" itemprop="copyrightHolder">crosswalk</span>
+  <span class="author" itemprop="copyrightHolder">Liu Qianglong</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> v4.0.0
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
   </div>
   <span class="post-meta-divider">|</span>
-  <div class="theme-info">Theme – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.7.2
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
   </div>
+-->
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 
@@ -453,9 +555,20 @@
 
 
   
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
 
 
 
+
+  <script src="/js/local-search.js"></script>
 
 
 
@@ -471,6 +584,35 @@
   
 
   
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'stf5rGD17bcrWN1mvUT4pu8C-gzGzoHsz',
+      appKey     : 'r5qpzBWMAzt2hDAcDftecM1R',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
 
 </body>
 </html>

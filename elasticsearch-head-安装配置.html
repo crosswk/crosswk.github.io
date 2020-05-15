@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="baidu-site-verification" content="true">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Pisces","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"default"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="由于ES官方并没有为ES提供界面管理工具，仅仅是提供了后台服务。elasticsearch-head是一个为ES开发的一个页面客户端工具。">
+<meta name="keywords" content="ELK,elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="elasticsearch-head 安装配置">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;elasticsearch-head-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE.html">
+<meta property="og:site_name" content="Crosswalk Blog">
+<meta property="og:description" content="由于ES官方并没有为ES提供界面管理工具，仅仅是提供了后台服务。elasticsearch-head是一个为ES开发的一个页面客户端工具。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;es-head.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-GUI-create-index-1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-GUI-create-index-2.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-GUI-create-index-3.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-API-crate-index.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-API-delete-index.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-insert-data-id.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-show-data.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;ELK-insert-data.png">
+<meta property="og:updated_time" content="2020-05-15T04:12:43.169Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;images&#x2F;blog&#x2F;elk&#x2F;es-head.png">
+
+<link rel="canonical" href="http://yoursite.com/elasticsearch-head-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>elasticsearch-head 安装配置 | Crosswalk Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Crosswalk Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/elasticsearch-head-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/me.jpg">
+      <meta itemprop="name" content="Liu Qianglong">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Crosswalk Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          elasticsearch-head 安装配置
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-13 15:22:42" itemprop="dateCreated datePublished" datetime="2020-05-13T15:22:42+08:00">2020-05-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-15 12:12:43" itemprop="dateModified" datetime="2020-05-15T12:12:43+08:00">2020-05-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ELK/" itemprop="url" rel="index"><span itemprop="name">ELK</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/elasticsearch-head-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE.html#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/elasticsearch-head-%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE.html" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>由于ES官方并没有为ES提供界面管理工具，仅仅是提供了后台服务。elasticsearch-head是一个为ES开发的一个页面客户端工具。</p>
+</blockquote>
+<h2 id="elasticsearch-head-安装"><a href="#elasticsearch-head-安装" class="headerlink" title="elasticsearch-head 安装"></a>elasticsearch-head 安装</h2><ul>
+<li><p>由于ES官方并没有为ES提供界面管理工具，仅仅是提供了后台服务。elasticsearch-head是一个为ES开发的一个页面客户端工具，源码托管于<a href="https://github.com/mobz/elasticsearch-head" target="_blank" rel="noopener">GitHub</a>，推荐通过chrome插件安装。</p>
+</li>
+<li><p>如果不是通过chrome方式安装，由于前后端分离开发，所有会存在跨越的问题，需要在服务器端做CORS的配置</p>
+<figure class="highlight autoit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="symbol">@centos8</span> ~]<span class="meta"># vim /etc/elasticsearch/elasticsearch.yml</span></span><br><span class="line"></span><br><span class="line">http.cors.enabled: <span class="literal">true</span></span><br><span class="line">http.cors.allowd-origin: <span class="string">"*"</span></span><br><span class="line"></span><br><span class="line"><span class="meta"># 添加上面两条命令，如果是chrome插件方式安装，不存在这个问题。</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过elasticsearch-head连接elasticsearch</p>
+</li>
+</ul>
+<p><img src="../images/blog/elk/es-head.png" alt="es-head"></p>
+<h3 id="创建索引，删除索引"><a href="#创建索引，删除索引" class="headerlink" title="创建索引，删除索引"></a>创建索引，删除索引</h3><ul>
+<li>图形化创建索引</li>
+</ul>
+<p><img src="../images/blog/elk/ELK-GUI-create-index-1.png" alt="ELK-GUI create index-1"></p>
+<p><img src="../images/blog/elk/ELK-GUI-create-index-2.png" alt="ELK-GUI create index-2"></p>
+<p><img src="../images/blog/elk/ELK-GUI-create-index-3.png" alt="ELK-GUI create index-3"></p>
+<ul>
+<li>API方式创建索引，Chrome安装Talend API Tester插件发送PUT请求。</li>
+</ul>
+<p><img src="../images/blog/elk/ELK-API-crate-index.png" alt="ELK-API crate index"></p>
+<ul>
+<li>API方式删除索引，例如想要删除<code>test</code>这个索引。</li>
+</ul>
+<p><img src="../images/blog/elk/ELK-API-delete-index.png" alt="ELK-API delete index"></p>
+<h3 id="插入数据"><a href="#插入数据" class="headerlink" title="插入数据"></a>插入数据</h3><ul>
+<li>URL规则：<code>POST/{索引}/{类型}/{id}</code></li>
+</ul>
+<p><img src="../images/blog/elk/ELK-insert-data-id.png" alt="ELK-插入数据"></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># 数据</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"id"</span>:<span class="number">1001</span>,</span><br><span class="line">  <span class="attr">"name"</span>:<span class="string">"张三"</span>,</span><br><span class="line">  <span class="attr">"age"</span>:<span class="string">"20"</span>,</span><br><span class="line">  <span class="attr">"sex"</span>:<span class="string">"男"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 响应</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line"><span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line"><span class="attr">"_id"</span>: <span class="string">"1001"</span>,</span><br><span class="line"><span class="attr">"_version"</span>: <span class="number">1</span>,</span><br><span class="line"><span class="attr">"result"</span>: <span class="string">"created"</span>,</span><br><span class="line"><span class="attr">"_shards"</span>:&#123;</span><br><span class="line"><span class="attr">"total"</span>: <span class="number">1</span>,</span><br><span class="line"><span class="attr">"successful"</span>: <span class="number">1</span>,</span><br><span class="line"><span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">"_seq_no"</span>: <span class="number">0</span>,</span><br><span class="line"><span class="attr">"_primary_term"</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>查看数据，这里<code>_id</code>是数据的唯一标识符。说明：非结构化的索引，不需要事先创建，直接插入数据默认创建索引。</li>
+</ul>
+<p><img src="../images/blog/elk/ELK-show-data.png" alt="ELK-查看数据"></p>
+<ul>
+<li>发起<code>POST</code>请求<code>http://172.20.29.75:9200/estest/user</code>。这里我们的POST请求中并没有指定数据的唯一id。这里的内容里面的<code>id</code>是数据里面的一个字段。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 请求内容</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"id"</span>:<span class="number">1002</span>,</span><br><span class="line">  <span class="attr">"name"</span>:<span class="string">"李四"</span>,</span><br><span class="line">  <span class="attr">"age"</span>:<span class="string">"21"</span>,</span><br><span class="line">  <span class="attr">"sex"</span>:<span class="string">"女"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这里是随机产生的唯一id。</li>
+</ul>
+<p><img src="../images/blog/elk/ELK-insert-data.png" alt="ELK-插入数据 ID"></p>
+<h3 id="更新数据"><a href="#更新数据" class="headerlink" title="更新数据"></a>更新数据</h3><ul>
+<li>elasticsearch中，不能直接修改文档数据，但是可以通过覆盖的方式进行更新。这里使用<code>PUT</code>方式对数据的唯一id<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">PUT http://172.20.29.75:9200/estest/user/1001</span><br><span class="line"></span><br><span class="line"># 请求内容</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"id"</span>:<span class="number">1001</span>,</span><br><span class="line">  <span class="attr">"name"</span>:<span class="string">"张三"</span>,</span><br><span class="line">  <span class="attr">"age"</span>:<span class="string">"21"</span>,</span><br><span class="line">  <span class="attr">"sex"</span>:<span class="string">"女"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 响应内容，注意这里的_version</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">	<span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">	<span class="attr">"_id"</span>: <span class="string">"1001"</span>,</span><br><span class="line">	<span class="attr">"_version"</span>: <span class="number">2</span>,</span><br><span class="line">	<span class="attr">"result"</span>: <span class="string">"updated"</span>,</span><br><span class="line">	<span class="attr">"_shards"</span>: &#123;</span><br><span class="line">		<span class="attr">"total"</span>: <span class="number">1</span>,</span><br><span class="line">		<span class="attr">"successful"</span>: <span class="number">1</span>,</span><br><span class="line">		<span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">"_seq_no"</span>: <span class="number">2</span>,</span><br><span class="line">	<span class="attr">"_primary_term"</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 如果修改的数据，缺少一个字段，以前的字段不会被保留，因为这种方式对数据做的是全量更新。</span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"id"</span>:<span class="number">1001</span>,</span><br><span class="line">  <span class="attr">"name"</span>:<span class="string">"张三"</span>,</span><br><span class="line">  <span class="attr">"age"</span>:<span class="string">"22"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>局部更新过程<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>从旧文档中检索JSON</span><br><span class="line"><span class="number">2.</span>修改JSON文件</span><br><span class="line"><span class="number">3.</span>删除旧文档</span><br><span class="line"><span class="number">4.</span>索引新文档</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<ul>
+<li>注意这里方式是<code>POST</code>，在唯一id后面加<code>_update</code>参数，请求内容需要用<code>doc</code>封装。<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/1001/_update</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="attr">"doc"</span>:&#123;</span><br><span class="line">    <span class="attr">"age"</span>:<span class="number">23</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="删除数据"><a href="#删除数据" class="headerlink" title="删除数据"></a>删除数据</h4><ul>
+<li><p>在elasticsearch中，删除文档数据，只需要发起DELETE请求即可。注意result的结果，version也增加了。如果删除一条不存在的数据，会响应404，并且响应的结果是<code>not_found</code>。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">DELETE http://172.20.29.75:9200/estest/user/1001</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 响应</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">	<span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">	<span class="attr">"_id"</span>: <span class="string">"1001_update"</span>,</span><br><span class="line">	<span class="attr">"_version"</span>: <span class="number">2</span>,</span><br><span class="line">	<span class="attr">"result"</span>: <span class="string">"deleted"</span>,</span><br><span class="line">	<span class="attr">"_shards"</span>: &#123;</span><br><span class="line">		<span class="attr">"total"</span>: <span class="number">1</span>,</span><br><span class="line">		<span class="attr">"successful"</span>: <span class="number">1</span>,</span><br><span class="line">		<span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">"_seq_no"</span>: <span class="number">6</span>,</span><br><span class="line">	<span class="attr">"_primary_term"</span>: <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>说明：删除一个文档也不会立即从磁盘上移除，它只是被标记成已经删除。es会在添加更多索引的时候才会在后台进行删除内容的清理。</p>
+</li>
+</ul>
+<h4 id="搜索数据"><a href="#搜索数据" class="headerlink" title="搜索数据"></a>搜索数据</h4><ul>
+<li><p>根据id搜索数据</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">GET http://172.20.29.75:9200/estest/user/VGGN3nABTHZ9F_yB_hk_</span><br><span class="line"></span><br><span class="line"># 返回的数据</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">	<span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">	<span class="attr">"_id"</span>: <span class="string">"VGGN3nABTHZ9F_yB_hk_"</span>,</span><br><span class="line">	<span class="attr">"_version"</span>: <span class="number">1</span>,</span><br><span class="line">	<span class="attr">"_seq_no"</span>: <span class="number">1</span>,</span><br><span class="line">	<span class="attr">"_primary_term"</span>: <span class="number">1</span>,</span><br><span class="line">	<span class="attr">"found"</span>: <span class="literal">true</span>,</span><br><span class="line">	<span class="attr">"_source"</span>: &#123;</span><br><span class="line">		<span class="attr">"id"</span>: <span class="number">1002</span>,</span><br><span class="line">		<span class="attr">"name"</span>: <span class="string">"李四"</span>,</span><br><span class="line">		<span class="attr">"age"</span>: <span class="string">"21"</span>,</span><br><span class="line">		<span class="attr">"sex"</span>: <span class="string">"女"</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>搜索全部数据，默认响应10条数据。</p>
+</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET http://172.20.29.75:9200/estest/user/_search</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>关键字搜索数据<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># 查询年龄等于20的用户</span><br><span class="line"></span><br><span class="line">GET http://172.20.29.75:9200/estest/user/_search?q=age:21</span><br><span class="line"></span><br><span class="line"># 响应的数据</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"took"</span>: <span class="number">30</span>,</span><br><span class="line">	<span class="attr">"timed_out"</span>: <span class="literal">false</span>,</span><br><span class="line">	<span class="attr">"_shards"</span>: &#123;</span><br><span class="line">		<span class="attr">"total"</span>: <span class="number">2</span>,</span><br><span class="line">		<span class="attr">"successful"</span>: <span class="number">2</span>,</span><br><span class="line">		<span class="attr">"skipped"</span>: <span class="number">0</span>,</span><br><span class="line">		<span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">"hits"</span>: &#123;</span><br><span class="line">		<span class="attr">"total"</span>: &#123;</span><br><span class="line">			<span class="attr">"value"</span>: <span class="number">1</span>,</span><br><span class="line">			<span class="attr">"relation"</span>: <span class="string">"eq"</span></span><br><span class="line">		&#125;,</span><br><span class="line">		<span class="attr">"max_score"</span>: <span class="number">0.6931471</span>,</span><br><span class="line">		<span class="attr">"hits"</span>: [&#123;</span><br><span class="line">			<span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">			<span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">			<span class="attr">"_id"</span>: <span class="string">"VGGN3nABTHZ9F_yB_hk_"</span>,</span><br><span class="line">			<span class="attr">"_score"</span>: <span class="number">0.6931471</span>,</span><br><span class="line">			<span class="attr">"_source"</span>: &#123;</span><br><span class="line">				<span class="attr">"id"</span>: <span class="number">1002</span>,</span><br><span class="line">				<span class="attr">"name"</span>: <span class="string">"李四"</span>,</span><br><span class="line">				<span class="attr">"age"</span>: <span class="string">"21"</span>,</span><br><span class="line">				<span class="attr">"sex"</span>: <span class="string">"女"</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;]</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h4 id="DSL-搜索"><a href="#DSL-搜索" class="headerlink" title="DSL 搜索"></a>DSL 搜索</h4><ul>
+<li><p>elasticsearch提供特定查询语句DSL查询（Query DSL）DSL（Domain Specific Language 特定领域语言）以JSON请求体的形式出现。</p>
+</li>
+<li><p>之前在RESTful中都是通过GET请求来查询数据，这里DSL通过POST请求查询，因为需要提交json请求数据。</p>
+</li>
+</ul>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">POST <span class="symbol">http:</span>/<span class="regexp">/172.20.29.75:9200/estest</span><span class="regexp">/user/</span>_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="string">"query"</span><span class="symbol">:</span>&#123;</span><br><span class="line">		<span class="string">"match"</span><span class="symbol">:</span>&#123;</span><br><span class="line">			<span class="string">"age"</span><span class="symbol">:</span><span class="number">21</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这里可以借助Postman这个软件来发起json请求。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># 注意，这里使用“_bulk?pretty”发起批量请求，json内容最后一定要添加空行。</span><br><span class="line"></span><br><span class="line">POST http://172.20.29.75:9200/_bulk?pretty</span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">"index"</span>: &#123;<span class="attr">"_index"</span>: <span class="string">"estest"</span>&#125;</span><br><span class="line">&#123;<span class="attr">"id"</span>:<span class="number">1001</span>,<span class="attr">"name"</span>:<span class="string">"张三"</span>,<span class="attr">"age"</span>:<span class="number">20</span>,<span class="attr">"sex"</span>:<span class="string">"男"</span>&#125;</span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">"index"</span>: &#123;<span class="attr">"_index"</span>: <span class="string">"estest"</span>&#125;</span><br><span class="line">&#123;<span class="attr">"id"</span>:<span class="number">1002</span>,<span class="attr">"name"</span>:<span class="string">"李四"</span>,<span class="attr">"age"</span>:<span class="number">21</span>,<span class="attr">"sex"</span>:<span class="string">"女"</span>&#125;</span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">"index"</span>: &#123;<span class="attr">"_index"</span>: <span class="string">"estest"</span>&#125;</span><br><span class="line">&#123;<span class="attr">"id"</span>:<span class="number">1003</span>,<span class="attr">"name"</span>:<span class="string">"王五"</span>,<span class="attr">"age"</span>:<span class="number">31</span>,<span class="attr">"sex"</span>:<span class="string">"男"</span>&#125;</span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">"index"</span>: &#123;<span class="attr">"_index"</span>: <span class="string">"estest"</span>&#125;</span><br><span class="line">&#123;<span class="attr">"id"</span>:<span class="number">1004</span>,<span class="attr">"name"</span>:<span class="string">"赵六"</span>,<span class="attr">"age"</span>:<span class="number">32</span>,<span class="attr">"sex"</span>:<span class="string">"女"</span>&#125;</span><br><span class="line"></span><br><span class="line">&#123;<span class="attr">"index"</span>: &#123;<span class="attr">"_index"</span>: <span class="string">"estest"</span>&#125;</span><br><span class="line">&#123;<span class="attr">"id"</span>:<span class="number">1005</span>,<span class="attr">"name"</span>:<span class="string">"孙七"</span>,<span class="attr">"age"</span>:<span class="number">33</span>,<span class="attr">"sex"</span>:<span class="string">"男"</span>&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>这里做query查询，使用bool查询，这里设置2个bool查询方式，filter和must，过滤age大于30的，sex必须为男。匹配同时满足这2个条件的数据。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"query"</span>:&#123;</span><br><span class="line">		<span class="attr">"bool"</span>:&#123;</span><br><span class="line">			<span class="attr">"filter"</span>:&#123;</span><br><span class="line">				<span class="attr">"range"</span>:&#123;</span><br><span class="line">					<span class="attr">"age"</span>:&#123;</span><br><span class="line">						<span class="attr">"gt"</span>:<span class="number">30</span></span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;,</span><br><span class="line">			<span class="attr">"must"</span>:&#123;</span><br><span class="line">				<span class="attr">"match"</span>:&#123;</span><br><span class="line">					<span class="attr">"sex"</span>:<span class="string">"男"</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 响应结果</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"took"</span>: <span class="number">11</span>,</span><br><span class="line">    <span class="attr">"timed_out"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"_shards"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"successful"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"skipped"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"hits"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: &#123;</span><br><span class="line">            <span class="attr">"value"</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="attr">"relation"</span>: <span class="string">"eq"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"max_score"</span>: <span class="number">0.9808291</span>,</span><br><span class="line">        <span class="attr">"hits"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"WmFe4XABTHZ9F_yBuRmM"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">0.9808291</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1003</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"王五"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">31</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"男"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"XGFe4XABTHZ9F_yBuRmM"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">0.18232156</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1005</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"孙七"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">33</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"男"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>全文搜索，搜索name为张三或者李四的数据。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/_search</span><br><span class="line"></span><br><span class="line"># 发送数据</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"query"</span>:&#123;</span><br><span class="line">		<span class="attr">"match"</span>:&#123;</span><br><span class="line">			<span class="attr">"name"</span>:<span class="string">"张三 李四"</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 响应结果</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"took"</span>: <span class="number">4</span>,</span><br><span class="line">    <span class="attr">"timed_out"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"_shards"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"successful"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"skipped"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"hits"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: &#123;</span><br><span class="line">            <span class="attr">"value"</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="attr">"relation"</span>: <span class="string">"eq"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"max_score"</span>: <span class="number">1.9616582</span>,</span><br><span class="line">        <span class="attr">"hits"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"WWFe4XABTHZ9F_yBuRmM"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">1.9616582</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1002</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"李四"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">21</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"女"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"WGFe4XABTHZ9F_yBuRmL"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">1.3862942</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1001</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"张三"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">20</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"男"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>高亮显示</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"query"</span>:&#123;</span><br><span class="line">		<span class="attr">"match"</span>:&#123;</span><br><span class="line">			<span class="attr">"name"</span>:<span class="string">"张三 李四"</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">	<span class="attr">"highlight"</span>:&#123;</span><br><span class="line">		<span class="attr">"fields"</span>:&#123;</span><br><span class="line">			<span class="attr">"name"</span>:&#123;&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 响应结果，这里高亮汉字需要注意分词的问题。</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"took"</span>: <span class="number">56</span>,</span><br><span class="line">    <span class="attr">"timed_out"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"_shards"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"successful"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"skipped"</span>: <span class="number">0</span>,</span><br><span class="line">        <span class="attr">"failed"</span>: <span class="number">0</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"hits"</span>: &#123;</span><br><span class="line">        <span class="attr">"total"</span>: &#123;</span><br><span class="line">            <span class="attr">"value"</span>: <span class="number">2</span>,</span><br><span class="line">            <span class="attr">"relation"</span>: <span class="string">"eq"</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="attr">"max_score"</span>: <span class="number">1.9616582</span>,</span><br><span class="line">        <span class="attr">"hits"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"WWFe4XABTHZ9F_yBuRmM"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">1.9616582</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1002</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"李四"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">21</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"女"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"highlight"</span>: &#123;</span><br><span class="line">                    <span class="attr">"name"</span>: [</span><br><span class="line">                        <span class="string">"&lt;em&gt;李&lt;/em&gt;&lt;em&gt;四&lt;/em&gt;"</span></span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"_index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"_type"</span>: <span class="string">"user"</span>,</span><br><span class="line">                <span class="attr">"_id"</span>: <span class="string">"WGFe4XABTHZ9F_yBuRmL"</span>,</span><br><span class="line">                <span class="attr">"_score"</span>: <span class="number">1.3862942</span>,</span><br><span class="line">                <span class="attr">"_source"</span>: &#123;</span><br><span class="line">                    <span class="attr">"id"</span>: <span class="number">1001</span>,</span><br><span class="line">                    <span class="attr">"name"</span>: <span class="string">"张三"</span>,</span><br><span class="line">                    <span class="attr">"age"</span>: <span class="number">20</span>,</span><br><span class="line">                    <span class="attr">"sex"</span>: <span class="string">"男"</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="attr">"highlight"</span>: &#123;</span><br><span class="line">                    <span class="attr">"name"</span>: [</span><br><span class="line">                        <span class="string">"&lt;em&gt;张&lt;/em&gt;&lt;em&gt;三&lt;/em&gt;"</span></span><br><span class="line">                    ]</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>聚合，这里先将张三年龄修改的和李四一样。</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/WGFe4XABTHZ9F_yBuRmL/_update</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"doc"</span>:&#123;</span><br><span class="line">		<span class="attr">"age"</span>:<span class="number">21</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>这里聚合报错，暂时不知道什么问题<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">POST http://172.20.29.75:9200/estest/user/_search</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"aggs"</span>:&#123;</span><br><span class="line">		<span class="attr">"all_interests"</span>:&#123;</span><br><span class="line">			<span class="attr">"terms"</span>:&#123;</span><br><span class="line">				<span class="attr">"field"</span>:<span class="string">"age"</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#报错内容</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"error"</span>: &#123;</span><br><span class="line">        <span class="attr">"root_cause"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"type"</span>: <span class="string">"illegal_argument_exception"</span>,</span><br><span class="line">                <span class="attr">"reason"</span>: <span class="string">"Text fields are not optimised for operations that require per-document field data like aggregations and sorting, so these operations are disabled by default. Please use a keyword field instead. Alternatively, set fielddata=true on [age] in order to load field data by uninverting the inverted index. Note that this can use significant memory."</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"search_phase_execution_exception"</span>,</span><br><span class="line">        <span class="attr">"reason"</span>: <span class="string">"all shards failed"</span>,</span><br><span class="line">        <span class="attr">"phase"</span>: <span class="string">"query"</span>,</span><br><span class="line">        <span class="attr">"grouped"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">"failed_shards"</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"shard"</span>: <span class="number">0</span>,</span><br><span class="line">                <span class="attr">"index"</span>: <span class="string">"estest"</span>,</span><br><span class="line">                <span class="attr">"node"</span>: <span class="string">"Qcxv7GXOSt6PgiXR11Ea6A"</span>,</span><br><span class="line">                <span class="attr">"reason"</span>: &#123;</span><br><span class="line">                    <span class="attr">"type"</span>: <span class="string">"illegal_argument_exception"</span>,</span><br><span class="line">                    <span class="attr">"reason"</span>: <span class="string">"Text fields are not optimised for operations that require per-document field data like aggregations and sorting, so these operations are disabled by default. Please use a keyword field instead. Alternatively, set fielddata=true on [age] in order to load field data by uninverting the inverted index. Note that this can use significant memory."</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"caused_by"</span>: &#123;</span><br><span class="line">            <span class="attr">"type"</span>: <span class="string">"illegal_argument_exception"</span>,</span><br><span class="line">            <span class="attr">"reason"</span>: <span class="string">"Text fields are not optimised for operations that require per-document field data like aggregations and sorting, so these operations are disabled by default. Please use a keyword field instead. Alternatively, set fielddata=true on [age] in order to load field data by uninverting the inverted index. Note that this can use significant memory."</span>,</span><br><span class="line">            <span class="attr">"caused_by"</span>: &#123;</span><br><span class="line">                <span class="attr">"type"</span>: <span class="string">"illegal_argument_exception"</span>,</span><br><span class="line">                <span class="attr">"reason"</span>: <span class="string">"Text fields are not optimised for operations that require per-document field data like aggregations and sorting, so these operations are disabled by default. Please use a keyword field instead. Alternatively, set fielddata=true on [age] in order to load field data by uninverting the inverted index. Note that this can use significant memory."</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"status"</span>: <span class="number">400</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ELK/" rel="tag"># ELK</a>
+              <a href="/tags/elasticsearch/" rel="tag"># elasticsearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/hello-world.html" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#elasticsearch-head-安装"><span class="nav-text">elasticsearch-head 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建索引，删除索引"><span class="nav-text">创建索引，删除索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入数据"><span class="nav-text">插入数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新数据"><span class="nav-text">更新数据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#删除数据"><span class="nav-text">删除数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#搜索数据"><span class="nav-text">搜索数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DSL-搜索"><span class="nav-text">DSL 搜索</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Liu Qianglong"
+      src="/images/me.jpg">
+  <p class="site-author-name" itemprop="name">Liu Qianglong</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/crosswk" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;crosswk" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/liuqianglong@outlook.com" title="E-Mail → liuqianglong@outlook.com"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Liu Qianglong</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.2
+  </div>
+-->
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'stf5rGD17bcrWN1mvUT4pu8C-gzGzoHsz',
+      appKey     : 'r5qpzBWMAzt2hDAcDftecM1R',
+      placeholder: "Just go go",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
